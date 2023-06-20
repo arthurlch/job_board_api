@@ -44,7 +44,6 @@ Flexibility for future role additions: If you anticipate the need to add more us
 
 
 ```mermaid
-
 classDiagram
     class JobSeeker {
       +id : int
