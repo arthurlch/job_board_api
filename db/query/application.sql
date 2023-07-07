@@ -19,16 +19,13 @@ INSERT INTO Application (
   CURRENT_TIMESTAMP -- updated_at
 ) RETURNING id;
 
-
 -- Select statement for retrieving data from the "Application" table
 SELECT * FROM Application;
-
 
 -- Update statement for the "Application" table
 UPDATE Application
 SET status = $1, updated_at = CURRENT_TIMESTAMP
 WHERE id = $2; -- Specify the condition for updating, such as the "id" column
-
 
 -- Delete statement for the "Application" table
 DELETE FROM Application
