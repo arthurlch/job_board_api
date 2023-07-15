@@ -5,47 +5,119 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateJob(t *testing.T) {
+func createRandomJob(t *testing.T, db *sql.DB, mock sqlmock.Sqlmock) Job {
 	arg := CreateJobParams{
 		Title:        sql.NullString{String: "Software Engineer", Valid: true},
-		Description:  sql.NullString{String: "Develop web applications", Valid: true},
-		Requirements: sql.NullString{String: "Experience with Go and SQL", Valid: true},
-		Location:     sql.NullString{String: "New York, NY", Valid: true},
-		Salary:       sql.NullString{String: "100,000 - 120,000 USD per year", Valid: true},
-		CompanyID:    sql.NullInt32{Int32: 1, Valid: true}, 
+		Description:  sql.NullString{String: "Develop and maintain software", Valid: true},
+		Requirements: sql.NullString{String: "Knowledge in Go", Valid: true},
+		Location:     sql.NullString{String: "Remote", Valid: true},
+		Salary:       sql.NullString{String: "80K", Valid: true},
+		CompanyID:    sql.NullInt32{Int32: 1, Valid: true},
 	}
 
-	id, err := testQueries.CreateJob(context.TODO(), arg)
+	mock.ExpectQuery("INSERT INTO \"Job\"").
+		WithArgs(arg.Title, arg.Description, arg.Requirements, arg.Location, arg.Salary, arg.CompanyID).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
+	q := New(db)
+	jobID, err := q.CreateJob(context.TODO(), arg)
 	require.NoError(t, err)
-	assert.NotZero(t, id)
+	require.Equal(t, int32(1), jobID)
+
+	job := Job{
+		ID:           jobID,
+		Title:        arg.Title,
+		Description:  arg.Description,
+		Requirements: arg.Requirements,
+		Location:     arg.Location,
+		Salary:       arg.Salary,
+		CompanyID:    arg.CompanyID,
+	}
+
+	return job
 }
 
-func TestDeleteJob(t *testing.T) {
-	id := int32(1) 
-	err := testQueries.DeleteJob(context.TODO(), id)
+func TestCreateJob(t *testing.T) {
+	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
+	defer db.Close()
+
+	createRandomJob(t, db, mock)
+
+	require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestGetJobs(t *testing.T) {
-	jobs, err := testQueries.GetJobs(context.TODO())
+	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
-	assert.NotEmpty(t, jobs)
+
+	defer db.Close()
+
+	job := createRandomJob(t, db, mock)
+
+	rows := sqlmock.NewRows([]string{"id", "title", "description", "requirements", "location", "salary", "company_id"}).
+		AddRow(job.ID, job.Title, job.Description, job.Requirements, job.Location, job.Salary, job.CompanyID)
+
+	mock.ExpectQuery("SELECT").WillReturnRows(rows)
+
+	q := New(db)
+	jobs, err := q.GetJobs(context.Background())
+	require.NoError(t, err)
+
+	require.Len(t, jobs, 1)
+
+	require.Equal(t, job, jobs[0])
+	require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestUpdateJob(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	job := createRandomJob(t, db, mock)
+
 	arg := UpdateJobParams{
 		Title:        sql.NullString{String: "Senior Software Engineer", Valid: true},
-		Description:  sql.NullString{String: "Develop advanced web applications", Valid: true},
-		Requirements: sql.NullString{String: "Experience with Go, SQL, and microservices", Valid: true},
-		Location:     sql.NullString{String: "San Francisco, CA", Valid: true},
-		Salary:       sql.NullString{String: "120,000 - 140,000 USD per year", Valid: true},
-		ID:           1,
+		Description:  sql.NullString{String: "Develop and maintain software applications", Valid: true},
+		Requirements: sql.NullString{String: "Knowledge in Go and Python", Valid: true},
+		Location:     sql.NullString{String: "Remote", Valid: true},
+		Salary:       sql.NullString{String: "100K", Valid: true},
+		ID:           job.ID,
 	}
 
-	err := testQueries.UpdateJob(context.TODO(), arg)
+	mock.ExpectExec("UPDATE \"Job\"").
+		WithArgs(arg.Title, arg.Description, arg.Requirements, arg.Location, arg.Salary, arg.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	q := New(db)
+	err = q.UpdateJob(context.TODO(), arg)
+
 	require.NoError(t, err)
+	require.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestDeleteJob(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	job := createRandomJob(t, db, mock)
+
+	mock.ExpectExec("DELETE FROM \"Job\"").
+		WithArgs(job.ID).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	q := New(db)
+	err = q.DeleteJob(context.TODO(), job.ID)
+
+	require.NoError(t, err)
+	require.NoError(t, mock.ExpectationsWereMet())
 }

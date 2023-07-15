@@ -6,49 +6,124 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateExperience(t *testing.T) {
+func createRandomExperience(t *testing.T, db *sql.DB, mock sqlmock.Sqlmock) Experience {
 	arg := CreateExperienceParams{
 		JobSeekerID: sql.NullInt32{Int32: 1, Valid: true},
 		Title:       sql.NullString{String: "Software Engineer", Valid: true},
-		Company:     sql.NullString{String: "Tech Corp", Valid: true},
-		Location:    sql.NullString{String: "New York, NY", Valid: true},
-		StartDate:   sql.NullTime{Time: time.Now().AddDate(-2, 0, 0), Valid: true},
+		Company:     sql.NullString{String: "Tech Co.", Valid: true},
+		Location:    sql.NullString{String: "Anywhere", Valid: true},
+		StartDate:   sql.NullTime{Time: time.Now(), Valid: true},
 		EndDate:     sql.NullTime{Time: time.Now(), Valid: true},
-		Description: sql.NullString{String: "Developing web applications", Valid: true},
+		Description: sql.NullString{String: "Developed software", Valid: true},
 	}
 
-	id, err := testQueries.CreateExperience(context.TODO(), arg)
+	mock.ExpectQuery("INSERT INTO Experience").
+		WithArgs(arg.JobSeekerID, arg.Title, arg.Company, arg.Location, arg.StartDate, arg.EndDate, arg.Description).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
+	q := New(db)
+	experienceID, err := q.CreateExperience(context.TODO(), arg)
 	require.NoError(t, err)
-	assert.NotZero(t, id)
+	require.Equal(t, int32(1), experienceID)
+
+	experience := Experience{
+		ID:          experienceID,
+		JobSeekerID: arg.JobSeekerID,
+		Title:       arg.Title,
+		Company:     arg.Company,
+		Location:    arg.Location,
+		StartDate:   arg.StartDate,
+		EndDate:     arg.EndDate,
+		Description: arg.Description,
+		CreatedAt:   sql.NullTime{Time: time.Now(), Valid: true},
+		UpdatedAt:   sql.NullTime{Time: time.Now(), Valid: true},
+	}
+
+	return experience
 }
 
-func TestDeleteExperience(t *testing.T) {
-	id := int32(1) 
-	err := testQueries.DeleteExperience(context.TODO(), id)
+func TestCreateExperience(t *testing.T) {
+	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
+	defer db.Close()
+
+	createRandomExperience(t, db, mock)
+
+	require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestGetExperiences(t *testing.T) {
-	experiences, err := testQueries.GetExperiences(context.TODO())
+	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
-	assert.NotEmpty(t, experiences)
+
+	defer db.Close()
+
+	experience := createRandomExperience(t, db, mock)
+
+	rows := sqlmock.NewRows([]string{"id", "job_seeker_id", "title", "company", "location", "start_date", "end_date", "description", "created_at", "updated_at"}).
+		AddRow(experience.ID, experience.JobSeekerID, experience.Title, experience.Company, experience.Location, experience.StartDate, experience.EndDate, experience.Description, experience.CreatedAt, experience.UpdatedAt)
+
+	mock.ExpectQuery("SELECT").WillReturnRows(rows)
+
+	q := New(db)
+	experiences, err := q.GetExperiences(context.Background())
+	require.NoError(t, err)
+
+	require.Len(t, experiences, 1)
+
+	require.Equal(t, experience, experiences[0])
+	require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestUpdateExperience(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	experience := createRandomExperience(t, db, mock)
+
 	arg := UpdateExperienceParams{
 		Title:       sql.NullString{String: "Senior Software Engineer", Valid: true},
-		Company:     sql.NullString{String: "Updated Tech Corp", Valid: true},
-		Location:    sql.NullString{String: "San Francisco, CA", Valid: true},
-		StartDate:   sql.NullTime{Time: time.Now().AddDate(-3, 0, 0), Valid: true},
-		EndDate:     sql.NullTime{Time: time.Now().AddDate(-1, 0, 0), Valid: true},
-		Description: sql.NullString{String: "Developing advanced web applications", Valid: true},
-		ID:          1, 
+		Company:     sql.NullString{String: "Updated Tech Co.", Valid: true},
+		Location:    sql.NullString{String: "Updated Location", Valid: true},
+		StartDate:   sql.NullTime{Time: time.Now(), Valid: true},
+		EndDate:     sql.NullTime{Time: time.Now(), Valid: true},
+		Description: sql.NullString{String: "Updated software", Valid: true},
+		ID:          experience.ID,
 	}
 
-	err := testQueries.UpdateExperience(context.TODO(), arg)
+	mock.ExpectExec("UPDATE Experience").
+		WithArgs(arg.Title, arg.Company, arg.Location, arg.StartDate, arg.EndDate, arg.Description, arg.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	q := New(db)
+	err = q.UpdateExperience(context.TODO(), arg)
+
 	require.NoError(t, err)
+	require.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestDeleteExperience(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	defer db.Close()
+
+	experience := createRandomExperience(t, db, mock)
+
+	mock.ExpectExec("DELETE FROM Experience").
+		WithArgs(experience.ID).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	q := New(db)
+	err = q.DeleteExperience(context.TODO(), experience.ID)
+
+	require.NoError(t, err)
+	require.NoError(t, mock.ExpectationsWereMet())
 }
