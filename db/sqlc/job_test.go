@@ -6,17 +6,18 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/require"
 )
 
 func createRandomJob(t *testing.T, db *sql.DB, mock sqlmock.Sqlmock) Job {
 	arg := CreateJobParams{
-		Title:        sql.NullString{String: "Software Engineer", Valid: true},
-		Description:  sql.NullString{String: "Develop and maintain software", Valid: true},
-		Requirements: sql.NullString{String: "Knowledge in Go", Valid: true},
-		Location:     sql.NullString{String: "Remote", Valid: true},
-		Salary:       sql.NullString{String: "80K", Valid: true},
-		CompanyID:    sql.NullInt32{Int32: 1, Valid: true},
+		Title:        sql.NullString{String: gofakeit.JobTitle(), Valid: true},
+		Description:  sql.NullString{String: gofakeit.JobDescriptor(), Valid: true},
+		Requirements: sql.NullString{String: "Knowledge in " + gofakeit.ProgrammingLanguage(), Valid: true},
+		Location:     sql.NullString{String: gofakeit.City(), Valid: true},
+		Salary: sql.NullInt32{Int32: int32(gofakeit.Number(60000,150000)), Valid: true},
+		CompanyID:    sql.NullInt32{Int32: int32(gofakeit.Number(1, 1000)), Valid: true},
 	}
 
 	mock.ExpectQuery("INSERT INTO \"Job\"").
@@ -88,7 +89,7 @@ func TestUpdateJob(t *testing.T) {
 		Description:  sql.NullString{String: "Develop and maintain software applications", Valid: true},
 		Requirements: sql.NullString{String: "Knowledge in Go and Python", Valid: true},
 		Location:     sql.NullString{String: "Remote", Valid: true},
-		Salary:       sql.NullString{String: "100K", Valid: true},
+		Salary: sql.NullInt32{Int32: int32(gofakeit.Number(60000,150000)), Valid: true},
 		ID:           job.ID,
 	}
 

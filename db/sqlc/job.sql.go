@@ -38,7 +38,7 @@ type CreateJobParams struct {
 	Description  sql.NullString `json:"description"`
 	Requirements sql.NullString `json:"requirements"`
 	Location     sql.NullString `json:"location"`
-	Salary       sql.NullString `json:"salary"`
+	Salary       sql.NullInt32  `json:"salary"`
 	CompanyID    sql.NullInt32  `json:"company_id"`
 }
 
@@ -117,7 +117,7 @@ type UpdateJobParams struct {
 	Description  sql.NullString `json:"description"`
 	Requirements sql.NullString `json:"requirements"`
 	Location     sql.NullString `json:"location"`
-	Salary       sql.NullString `json:"salary"`
+	Salary       sql.NullInt32  `json:"salary"`
 	ID           int32          `json:"id"`
 }
 

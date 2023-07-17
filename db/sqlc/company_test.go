@@ -7,18 +7,19 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/require"
 )
 
 func createRandomCompany(t *testing.T, db *sql.DB, mock sqlmock.Sqlmock) Company {
 	arg := CreateCompanyParams{
-		UserID:      sql.NullInt32{Int32: 1, Valid: true},
-		Name:        sql.NullString{String: "Test Company", Valid: true},
-		Email:       sql.NullString{String: "test.company@example.com", Valid: true},
-		Phone:       sql.NullString{String: "1234567890", Valid: true},
-		Website:     sql.NullString{String: "https://test.company", Valid: true},
-		Logo:        sql.NullString{String: "https://test.company/logo.png", Valid: true},
-		Description: sql.NullString{String: "Test Description", Valid: true},
+		UserID:      sql.NullInt32{Int32: int32(gofakeit.Number(1, 1000)), Valid: true},
+		Name:        sql.NullString{String: gofakeit.Company(), Valid: true},
+		Email:       sql.NullString{String: gofakeit.Email(), Valid: true},
+		Phone:       sql.NullString{String: gofakeit.Phone(), Valid: true},
+		Website:     sql.NullString{String: gofakeit.URL(), Valid: true},
+		Logo:        sql.NullString{String: gofakeit.ImageURL(100, 100), Valid: true}, 
+		Description: sql.NullString{String: gofakeit.HipsterSentence(10), Valid: true},
 	}
 
 	mock.ExpectQuery("INSERT INTO \"Company\"").

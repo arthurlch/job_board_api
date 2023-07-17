@@ -7,19 +7,20 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/require"
 )
 
 func createRandomExperience(t *testing.T, db *sql.DB, mock sqlmock.Sqlmock) Experience {
 	arg := CreateExperienceParams{
-		JobSeekerID: sql.NullInt32{Int32: 1, Valid: true},
-		Title:       sql.NullString{String: "Software Engineer", Valid: true},
-		Company:     sql.NullString{String: "Tech Co.", Valid: true},
-		Location:    sql.NullString{String: "Anywhere", Valid: true},
-		StartDate:   sql.NullTime{Time: time.Now(), Valid: true},
-		EndDate:     sql.NullTime{Time: time.Now(), Valid: true},
-		Description: sql.NullString{String: "Developed software", Valid: true},
-	}
+		JobSeekerID: sql.NullInt32{Int32: int32(gofakeit.Number(1, 1000)), Valid: true},
+		Title:       sql.NullString{String: gofakeit.JobTitle(), Valid: true},
+		Company:     sql.NullString{String: gofakeit.Company(), Valid: true},
+		Location:    sql.NullString{String: gofakeit.City(), Valid: true},
+		StartDate:   sql.NullTime{Time: gofakeit.Date(), Valid: true},
+		EndDate:     sql.NullTime{Time: gofakeit.Date(), Valid: true},
+		Description: sql.NullString{String: gofakeit.JobDescriptor(), Valid: true},
+}
 
 	mock.ExpectQuery("INSERT INTO Experience").
 		WithArgs(arg.JobSeekerID, arg.Title, arg.Company, arg.Location, arg.StartDate, arg.EndDate, arg.Description).

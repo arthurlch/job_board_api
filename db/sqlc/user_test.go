@@ -7,14 +7,16 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/require"
 )
 
+
 func createRandomUser(t *testing.T, db *sql.DB, mock sqlmock.Sqlmock) User {
 	arg := CreateUserParams{
-		Name:  sql.NullString{String: "Test User", Valid: true},
-		Email: sql.NullString{String: "test.user@example.com", Valid: true},
-		Phone: sql.NullString{String: "1234567890", Valid: true},
+		Name:  sql.NullString{String: gofakeit.Name(), Valid: true},
+		Email: sql.NullString{String: gofakeit.Email(), Valid: true},
+		Phone: sql.NullString{String: gofakeit.Phone(), Valid: true},
 	}
 
 	mock.ExpectQuery("INSERT INTO \"User\"").

@@ -7,18 +7,20 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/require"
 )
 
 func createRandomEducation(t *testing.T, db *sql.DB, mock sqlmock.Sqlmock) Education {
 	arg := CreateEducationParams{
-		JobSeekerID:  sql.NullInt32{Int32: 1, Valid: true},
-		Institution:  sql.NullString{String: "Test University", Valid: true},
-		Degree:       sql.NullString{String: "Bachelor", Valid: true},
-		FieldOfStudy: sql.NullString{String: "Computer Science", Valid: true},
-		StartDate:    sql.NullTime{Time: time.Now(), Valid: true},
-		EndDate:      sql.NullTime{Time: time.Now(), Valid: true},
+		JobSeekerID:  sql.NullInt32{Int32: int32(gofakeit.Number(1, 1000)), Valid: true},
+		Institution:  sql.NullString{String: gofakeit.Company(), Valid: true}, 
+		Degree:       sql.NullString{String: gofakeit.BS(), Valid: true},  
+		FieldOfStudy: sql.NullString{String: gofakeit.BS(), Valid: true},  
+		StartDate:    sql.NullTime{Time: gofakeit.Date(), Valid: true},
+		EndDate:      sql.NullTime{Time: gofakeit.Date(), Valid: true},
 	}
+
 
 	mock.ExpectQuery("INSERT INTO \"Education\"").
 		WithArgs(arg.JobSeekerID, arg.Institution, arg.Degree, arg.FieldOfStudy, arg.StartDate, arg.EndDate).

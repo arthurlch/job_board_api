@@ -64,7 +64,7 @@ CREATE TABLE Job (
   description TEXT,
   requirements TEXT,
   location VARCHAR(255),
-  salary DECIMAL,
+  salary INTEGER,
   company_id INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

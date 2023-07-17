@@ -63,7 +63,7 @@ type Job struct {
 	Description  sql.NullString `json:"description"`
 	Requirements sql.NullString `json:"requirements"`
 	Location     sql.NullString `json:"location"`
-	Salary       sql.NullString `json:"salary"`
+	Salary       sql.NullInt32  `json:"salary"`
 	CompanyID    sql.NullInt32  `json:"company_id"`
 	CreatedAt    sql.NullTime   `json:"created_at"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`

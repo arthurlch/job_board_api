@@ -7,14 +7,15 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 )
 
 func createRandomJobSeeker(t *testing.T, db *sql.DB, mock sqlmock.Sqlmock) Jobseeker {
 	arg := CreateJobSeekerParams{
-		UserID: sql.NullInt32{Int32: 1, Valid: true},
-		Resume: sql.NullString{String: "resume.pdf", Valid: true},
+		UserID: sql.NullInt32{Int32: int32(gofakeit.Number(1, 1000)), Valid: true},
+		Resume: sql.NullString{String: gofakeit.Word() + ".pdf", Valid: true},
 		Skills: []string{"Go", "SQL", "Python"},
 	}
 
