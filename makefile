@@ -6,7 +6,7 @@ createdb:
 	docker exec -it postgres12 createdb --username=root --owner=root jobb_dev
 
 migrateup:
-	migrate -path db/migration -database "postgresql://root:password@localhost:5432/jobb_dev?sslmode=disable" -verbose up
+	migrate -path db/migration -database "postgresql://root:password@localhost:5432/jobb_dev?sslmode=disable" -verbose up 2>&1 | tee migration.log
 
 migratedown:
 	migrate -path db/migration -database "postgresql://root:password@localhost:5432/jobb_dev?sslmode=disable" -verbose down
@@ -16,6 +16,9 @@ dropdb:
 
 sqlc:
 	sqlc generate
+
+showschema:
+	docker exec -it postgres12 psql --username=root jobb_dev -c "\dt"
 
 test:
 	go test -v -cover -short ./...

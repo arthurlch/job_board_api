@@ -10,8 +10,16 @@ import (
 	"database/sql"
 )
 
-const createCompany = `-- name: CreateCompany :one
+const deleteCompany = `-- name: DeleteCompany :exec
+DELETE FROM Company WHERE id = $1
+`
 
+func (q *Queries) DeleteCompany(ctx context.Context, id int32) error {
+	_, err := q.exec(ctx, q.deleteCompanyStmt, deleteCompany, id)
+	return err
+}
+
+const insertCompany = `-- name: InsertCompany :exec
 INSERT INTO Company (
   user_id,
   name,
@@ -23,31 +31,23 @@ INSERT INTO Company (
   created_at,
   updated_at
 ) VALUES (
-  $1, -- user_id
-  $2, -- name
-  $3, -- email
-  $4, -- phone
-  $5, -- website
-  $6, -- logo
-  $7, -- description
-  CURRENT_TIMESTAMP, -- created_at
-  CURRENT_TIMESTAMP -- updated_at
+  $1, $2, $3, $4, $5, $6, $7,
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 ) RETURNING id
 `
 
-type CreateCompanyParams struct {
+type InsertCompanyParams struct {
 	UserID      sql.NullInt32  `json:"user_id"`
-	Name        sql.NullString `json:"name"`
-	Email       sql.NullString `json:"email"`
+	Name        string         `json:"name"`
+	Email       string         `json:"email"`
 	Phone       sql.NullString `json:"phone"`
 	Website     sql.NullString `json:"website"`
 	Logo        sql.NullString `json:"logo"`
 	Description sql.NullString `json:"description"`
 }
 
-// company.sql
-func (q *Queries) CreateCompany(ctx context.Context, arg CreateCompanyParams) (int32, error) {
-	row := q.queryRow(ctx, q.createCompanyStmt, createCompany,
+func (q *Queries) InsertCompany(ctx context.Context, arg InsertCompanyParams) error {
+	_, err := q.exec(ctx, q.insertCompanyStmt, insertCompany,
 		arg.UserID,
 		arg.Name,
 		arg.Email,
@@ -56,29 +56,15 @@ func (q *Queries) CreateCompany(ctx context.Context, arg CreateCompanyParams) (i
 		arg.Logo,
 		arg.Description,
 	)
-	var id int32
-	err := row.Scan(&id)
-	return id, err
-}
-
-const deleteCompany = `-- name: DeleteCompany :exec
-
-DELETE FROM Company
-WHERE id = $1
-`
-
-// Specify the condition for updating, such as the "id" column
-func (q *Queries) DeleteCompany(ctx context.Context, id int32) error {
-	_, err := q.exec(ctx, q.deleteCompanyStmt, deleteCompany, id)
 	return err
 }
 
-const getCompanies = `-- name: GetCompanies :many
+const selectAllCompanies = `-- name: SelectAllCompanies :many
 SELECT id, user_id, name, email, phone, website, logo, description, created_at, updated_at FROM Company
 `
 
-func (q *Queries) GetCompanies(ctx context.Context) ([]Company, error) {
-	rows, err := q.query(ctx, q.getCompaniesStmt, getCompanies)
+func (q *Queries) SelectAllCompanies(ctx context.Context) ([]Company, error) {
+	rows, err := q.query(ctx, q.selectAllCompaniesStmt, selectAllCompanies)
 	if err != nil {
 		return nil, err
 	}
@@ -111,15 +97,35 @@ func (q *Queries) GetCompanies(ctx context.Context) ([]Company, error) {
 	return items, nil
 }
 
+const selectCompanyByID = `-- name: SelectCompanyByID :one
+SELECT id, user_id, name, email, phone, website, logo, description, created_at, updated_at FROM Company WHERE id = $1
+`
+
+func (q *Queries) SelectCompanyByID(ctx context.Context, id int32) (Company, error) {
+	row := q.queryRow(ctx, q.selectCompanyByIDStmt, selectCompanyByID, id)
+	var i Company
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.Email,
+		&i.Phone,
+		&i.Website,
+		&i.Logo,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const updateCompany = `-- name: UpdateCompany :exec
-UPDATE Company
-SET name = $1, email = $2, phone = $3, website = $4, logo = $5, description = $6, updated_at = CURRENT_TIMESTAMP
-WHERE id = $7
+UPDATE Company SET name = $1, email = $2, phone = $3, website = $4, logo = $5, description = $6, updated_at = CURRENT_TIMESTAMP WHERE id = $7
 `
 
 type UpdateCompanyParams struct {
-	Name        sql.NullString `json:"name"`
-	Email       sql.NullString `json:"email"`
+	Name        string         `json:"name"`
+	Email       string         `json:"email"`
 	Phone       sql.NullString `json:"phone"`
 	Website     sql.NullString `json:"website"`
 	Logo        sql.NullString `json:"logo"`

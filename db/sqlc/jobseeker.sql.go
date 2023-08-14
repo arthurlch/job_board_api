@@ -21,35 +21,31 @@ INSERT INTO JobSeeker (
   created_at,
   updated_at
 ) VALUES (
-  $1, -- user_id
-  $2, -- resume
-  $3, -- skills
-  CURRENT_TIMESTAMP, -- created_at
-  CURRENT_TIMESTAMP -- updated_at
+  $1, $2, $3::text[],
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 ) RETURNING id
 `
 
 type CreateJobSeekerParams struct {
-	UserID sql.NullInt32  `json:"user_id"`
-	Resume sql.NullString `json:"resume"`
-	Skills []string       `json:"skills"`
+	UserID  sql.NullInt32  `json:"user_id"`
+	Resume  sql.NullString `json:"resume"`
+	Column3 []string       `json:"column_3"`
 }
 
 // jobseeker.sql
+// Insert
 func (q *Queries) CreateJobSeeker(ctx context.Context, arg CreateJobSeekerParams) (int32, error) {
-	row := q.queryRow(ctx, q.createJobSeekerStmt, createJobSeeker, arg.UserID, arg.Resume, pq.Array(arg.Skills))
+	row := q.queryRow(ctx, q.createJobSeekerStmt, createJobSeeker, arg.UserID, arg.Resume, pq.Array(arg.Column3))
 	var id int32
 	err := row.Scan(&id)
 	return id, err
 }
 
 const deleteJobSeeker = `-- name: DeleteJobSeeker :exec
-
-DELETE FROM JobSeeker
-WHERE id = $1
+DELETE FROM JobSeeker WHERE id = $1
 `
 
-// Specify the condition for updating, such as the "id" column
+// Delete
 func (q *Queries) DeleteJobSeeker(ctx context.Context, id int32) error {
 	_, err := q.exec(ctx, q.deleteJobSeekerStmt, deleteJobSeeker, id)
 	return err
@@ -59,6 +55,7 @@ const getJobSeekers = `-- name: GetJobSeekers :many
 SELECT id, user_id, resume, skills, created_at, updated_at FROM JobSeeker
 `
 
+// Select all
 func (q *Queries) GetJobSeekers(ctx context.Context) ([]Jobseeker, error) {
 	rows, err := q.query(ctx, q.getJobSeekersStmt, getJobSeekers)
 	if err != nil {
@@ -90,23 +87,22 @@ func (q *Queries) GetJobSeekers(ctx context.Context) ([]Jobseeker, error) {
 }
 
 const updateJobSeeker = `-- name: UpdateJobSeeker :exec
-UPDATE JobSeeker
-SET user_id = $1, resume = $2, skills = $3, updated_at = CURRENT_TIMESTAMP
-WHERE id = $4
+UPDATE JobSeeker SET user_id = $1, resume = $2, skills = $3::text[], updated_at = CURRENT_TIMESTAMP WHERE id = $4
 `
 
 type UpdateJobSeekerParams struct {
-	UserID sql.NullInt32  `json:"user_id"`
-	Resume sql.NullString `json:"resume"`
-	Skills []string       `json:"skills"`
-	ID     int32          `json:"id"`
+	UserID  sql.NullInt32  `json:"user_id"`
+	Resume  sql.NullString `json:"resume"`
+	Column3 []string       `json:"column_3"`
+	ID      int32          `json:"id"`
 }
 
+// Update
 func (q *Queries) UpdateJobSeeker(ctx context.Context, arg UpdateJobSeekerParams) error {
 	_, err := q.exec(ctx, q.updateJobSeekerStmt, updateJobSeeker,
 		arg.UserID,
 		arg.Resume,
-		pq.Array(arg.Skills),
+		pq.Array(arg.Column3),
 		arg.ID,
 	)
 	return err

@@ -22,19 +22,13 @@ INSERT INTO Job (
   created_at,
   updated_at
 ) VALUES (
-  $1, -- title
-  $2, -- description
-  $3, -- requirements
-  $4, -- location
-  $5, -- salary
-  $6, -- company_id
-  CURRENT_TIMESTAMP, -- created_at
-  CURRENT_TIMESTAMP -- updated_at
+  $1, $2, $3, $4, $5, $6,
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 ) RETURNING id
 `
 
 type CreateJobParams struct {
-	Title        sql.NullString `json:"title"`
+	Title        string         `json:"title"`
 	Description  sql.NullString `json:"description"`
 	Requirements sql.NullString `json:"requirements"`
 	Location     sql.NullString `json:"location"`
@@ -43,6 +37,7 @@ type CreateJobParams struct {
 }
 
 // job.sql
+// Insert
 func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (int32, error) {
 	row := q.queryRow(ctx, q.createJobStmt, createJob,
 		arg.Title,
@@ -58,12 +53,10 @@ func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (int32, er
 }
 
 const deleteJob = `-- name: DeleteJob :exec
-
-DELETE FROM Job
-WHERE id = $1
+DELETE FROM Job WHERE id = $1
 `
 
-// Specify the condition for updating, such as the "id" column
+// Delete
 func (q *Queries) DeleteJob(ctx context.Context, id int32) error {
 	_, err := q.exec(ctx, q.deleteJobStmt, deleteJob, id)
 	return err
@@ -73,15 +66,28 @@ const getJobs = `-- name: GetJobs :many
 SELECT id, title, description, requirements, location, salary, company_id, created_at, updated_at FROM Job
 `
 
-func (q *Queries) GetJobs(ctx context.Context) ([]Job, error) {
+type GetJobsRow struct {
+	ID           int32          `json:"id"`
+	Title        string         `json:"title"`
+	Description  sql.NullString `json:"description"`
+	Requirements sql.NullString `json:"requirements"`
+	Location     sql.NullString `json:"location"`
+	Salary       sql.NullInt32  `json:"salary"`
+	CompanyID    sql.NullInt32  `json:"company_id"`
+	CreatedAt    sql.NullTime   `json:"created_at"`
+	UpdatedAt    sql.NullTime   `json:"updated_at"`
+}
+
+// Select all
+func (q *Queries) GetJobs(ctx context.Context) ([]GetJobsRow, error) {
 	rows, err := q.query(ctx, q.getJobsStmt, getJobs)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Job
+	var items []GetJobsRow
 	for rows.Next() {
-		var i Job
+		var i GetJobsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -107,13 +113,11 @@ func (q *Queries) GetJobs(ctx context.Context) ([]Job, error) {
 }
 
 const updateJob = `-- name: UpdateJob :exec
-UPDATE Job
-SET title = $1, description = $2, requirements = $3, location = $4, salary = $5, updated_at = CURRENT_TIMESTAMP
-WHERE id = $6
+UPDATE Job SET title = $1, description = $2, requirements = $3, location = $4, salary = $5, updated_at = CURRENT_TIMESTAMP WHERE id = $6
 `
 
 type UpdateJobParams struct {
-	Title        sql.NullString `json:"title"`
+	Title        string         `json:"title"`
 	Description  sql.NullString `json:"description"`
 	Requirements sql.NullString `json:"requirements"`
 	Location     sql.NullString `json:"location"`
@@ -121,6 +125,7 @@ type UpdateJobParams struct {
 	ID           int32          `json:"id"`
 }
 
+// Update
 func (q *Queries) UpdateJob(ctx context.Context, arg UpdateJobParams) error {
 	_, err := q.exec(ctx, q.updateJobStmt, updateJob,
 		arg.Title,

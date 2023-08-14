@@ -16,6 +16,7 @@ CREATE TABLE JobSeeker (
   id SERIAL PRIMARY KEY,
   user_id INT UNIQUE,
   resume VARCHAR(512),
+  skills text[],
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES "User"(id)

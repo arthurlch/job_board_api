@@ -6,24 +6,175 @@ package db
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"fmt"
 )
 
+type ApplicationStatus string
+
+const (
+	ApplicationStatusApplied     ApplicationStatus = "applied"
+	ApplicationStatusInterviewed ApplicationStatus = "interviewed"
+	ApplicationStatusOffered     ApplicationStatus = "offered"
+	ApplicationStatusRejected    ApplicationStatus = "rejected"
+)
+
+func (e *ApplicationStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ApplicationStatus(s)
+	case string:
+		*e = ApplicationStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ApplicationStatus: %T", src)
+	}
+	return nil
+}
+
+type NullApplicationStatus struct {
+	ApplicationStatus ApplicationStatus
+	Valid             bool // Valid is true if ApplicationStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullApplicationStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.ApplicationStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ApplicationStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullApplicationStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ApplicationStatus), nil
+}
+
+type InterviewStatus string
+
+const (
+	InterviewStatusPending InterviewStatus = "pending"
+	InterviewStatusPassed  InterviewStatus = "passed"
+	InterviewStatusFailed  InterviewStatus = "failed"
+)
+
+func (e *InterviewStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = InterviewStatus(s)
+	case string:
+		*e = InterviewStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for InterviewStatus: %T", src)
+	}
+	return nil
+}
+
+type NullInterviewStatus struct {
+	InterviewStatus InterviewStatus
+	Valid           bool // Valid is true if InterviewStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullInterviewStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.InterviewStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.InterviewStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullInterviewStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.InterviewStatus), nil
+}
+
+type JobStatus string
+
+const (
+	JobStatusActive JobStatus = "active"
+	JobStatusClosed JobStatus = "closed"
+	JobStatusDraft  JobStatus = "draft"
+	JobStatusPaused JobStatus = "paused"
+)
+
+func (e *JobStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = JobStatus(s)
+	case string:
+		*e = JobStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for JobStatus: %T", src)
+	}
+	return nil
+}
+
+type NullJobStatus struct {
+	JobStatus JobStatus
+	Valid     bool // Valid is true if JobStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullJobStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.JobStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.JobStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullJobStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.JobStatus), nil
+}
+
 type Application struct {
-	ID          int32          `json:"id"`
-	JobSeekerID sql.NullInt32  `json:"job_seeker_id"`
-	JobID       sql.NullInt32  `json:"job_id"`
-	CoverLetter sql.NullString `json:"cover_letter"`
-	Resume      sql.NullString `json:"resume"`
-	Status      sql.NullString `json:"status"`
-	CreatedAt   sql.NullTime   `json:"created_at"`
-	UpdatedAt   sql.NullTime   `json:"updated_at"`
+	ID          int32                 `json:"id"`
+	JobSeekerID sql.NullInt32         `json:"job_seeker_id"`
+	JobID       sql.NullInt32         `json:"job_id"`
+	CoverLetter sql.NullString        `json:"cover_letter"`
+	Resume      sql.NullString        `json:"resume"`
+	Status      NullApplicationStatus `json:"status"`
+	CreatedAt   sql.NullTime          `json:"created_at"`
+	UpdatedAt   sql.NullTime          `json:"updated_at"`
+}
+
+type Chatbotconversation struct {
+	ID                 int32          `json:"id"`
+	ChatbotInterviewID sql.NullInt32  `json:"chatbot_interview_id"`
+	SenderType         sql.NullString `json:"sender_type"`
+	Content            string         `json:"content"`
+	CreatedAt          sql.NullTime   `json:"created_at"`
+}
+
+type Chatbotinterview struct {
+	ID          int32               `json:"id"`
+	JobSeekerID sql.NullInt32       `json:"job_seeker_id"`
+	JobID       sql.NullInt32       `json:"job_id"`
+	Status      NullInterviewStatus `json:"status"`
+	Review      sql.NullString      `json:"review"`
+	CreatedAt   sql.NullTime        `json:"created_at"`
+	UpdatedAt   sql.NullTime        `json:"updated_at"`
 }
 
 type Company struct {
 	ID          int32          `json:"id"`
 	UserID      sql.NullInt32  `json:"user_id"`
-	Name        sql.NullString `json:"name"`
-	Email       sql.NullString `json:"email"`
+	Name        string         `json:"name"`
+	Email       string         `json:"email"`
 	Phone       sql.NullString `json:"phone"`
 	Website     sql.NullString `json:"website"`
 	Logo        sql.NullString `json:"logo"`
@@ -32,41 +183,64 @@ type Company struct {
 	UpdatedAt   sql.NullTime   `json:"updated_at"`
 }
 
+type Companyentity struct {
+	ID   int32          `json:"id"`
+	Name sql.NullString `json:"name"`
+}
+
 type Education struct {
-	ID           int32          `json:"id"`
-	JobSeekerID  sql.NullInt32  `json:"job_seeker_id"`
-	Institution  sql.NullString `json:"institution"`
-	Degree       sql.NullString `json:"degree"`
-	FieldOfStudy sql.NullString `json:"field_of_study"`
-	StartDate    sql.NullTime   `json:"start_date"`
-	EndDate      sql.NullTime   `json:"end_date"`
-	CreatedAt    sql.NullTime   `json:"created_at"`
-	UpdatedAt    sql.NullTime   `json:"updated_at"`
+	ID            int32          `json:"id"`
+	JobSeekerID   sql.NullInt32  `json:"job_seeker_id"`
+	InstitutionID sql.NullInt32  `json:"institution_id"`
+	Degree        sql.NullString `json:"degree"`
+	FieldOfStudy  sql.NullString `json:"field_of_study"`
+	StartDate     sql.NullTime   `json:"start_date"`
+	EndDate       sql.NullTime   `json:"end_date"`
+	CreatedAt     sql.NullTime   `json:"created_at"`
+	UpdatedAt     sql.NullTime   `json:"updated_at"`
 }
 
 type Experience struct {
 	ID          int32          `json:"id"`
 	JobSeekerID sql.NullInt32  `json:"job_seeker_id"`
 	Title       sql.NullString `json:"title"`
-	Company     sql.NullString `json:"company"`
+	CompanyID   sql.NullInt32  `json:"company_id"`
 	Location    sql.NullString `json:"location"`
 	StartDate   sql.NullTime   `json:"start_date"`
 	EndDate     sql.NullTime   `json:"end_date"`
+	TypeID      sql.NullInt32  `json:"type_id"`
 	Description sql.NullString `json:"description"`
 	CreatedAt   sql.NullTime   `json:"created_at"`
 	UpdatedAt   sql.NullTime   `json:"updated_at"`
 }
 
+type Experiencetype struct {
+	ID   int32          `json:"id"`
+	Name sql.NullString `json:"name"`
+}
+
+type Institution struct {
+	ID   int32          `json:"id"`
+	Name sql.NullString `json:"name"`
+}
+
 type Job struct {
 	ID           int32          `json:"id"`
-	Title        sql.NullString `json:"title"`
+	Title        string         `json:"title"`
 	Description  sql.NullString `json:"description"`
 	Requirements sql.NullString `json:"requirements"`
 	Location     sql.NullString `json:"location"`
 	Salary       sql.NullInt32  `json:"salary"`
 	CompanyID    sql.NullInt32  `json:"company_id"`
+	CategoryID   sql.NullInt32  `json:"category_id"`
+	Status       NullJobStatus  `json:"status"`
 	CreatedAt    sql.NullTime   `json:"created_at"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`
+}
+
+type Jobcategory struct {
+	ID   int32          `json:"id"`
+	Name sql.NullString `json:"name"`
 }
 
 type Jobseeker struct {
@@ -78,11 +252,47 @@ type Jobseeker struct {
 	UpdatedAt sql.NullTime   `json:"updated_at"`
 }
 
+type Jobseekerskill struct {
+	JobSeekerID int32 `json:"job_seeker_id"`
+	SkillID     int32 `json:"skill_id"`
+}
+
+type Jobview struct {
+	JobID     int32         `json:"job_id"`
+	ViewCount sql.NullInt32 `json:"view_count"`
+}
+
+type Message struct {
+	ID         int32          `json:"id"`
+	SenderID   int32          `json:"sender_id"`
+	ReceiverID int32          `json:"receiver_id"`
+	Content    string         `json:"content"`
+	SenderType sql.NullString `json:"sender_type"`
+	CreatedAt  sql.NullTime   `json:"created_at"`
+}
+
+type Scheduledinterview struct {
+	ID          int32          `json:"id"`
+	JobSeekerID sql.NullInt32  `json:"job_seeker_id"`
+	CompanyID   sql.NullInt32  `json:"company_id"`
+	ScheduledAt sql.NullTime   `json:"scheduled_at"`
+	Location    sql.NullString `json:"location"`
+	Notes       sql.NullString `json:"notes"`
+	MeetingLink sql.NullString `json:"meeting_link"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+}
+
+type Skill struct {
+	ID   int32          `json:"id"`
+	Name sql.NullString `json:"name"`
+}
+
 type User struct {
 	ID        int32          `json:"id"`
-	Name      sql.NullString `json:"name"`
-	Email     sql.NullString `json:"email"`
+	Name      string         `json:"name"`
+	Email     string         `json:"email"`
 	Phone     sql.NullString `json:"phone"`
+	Role      sql.NullString `json:"role"`
 	CreatedAt sql.NullTime   `json:"created_at"`
 	UpdatedAt sql.NullTime   `json:"updated_at"`
 }

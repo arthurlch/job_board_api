@@ -1,122 +1,184 @@
-# Database Relationships
+### DB Schema
 
-1. **User - JobSeeker Relationship:**
-   - A User can have an optional association with a JobSeeker entity (0 or 1).
-   - This relationship represents the connection between a User and their Job Seeker profile.
-   - It allows the User to have additional attributes specific to being a Job Seeker, such as a resume and skills.
-
-2. **User - Company Relationship:**
-   - A User can have an optional association with a Company entity (0 or 1).
-   - This relationship represents the connection between a User and their Company profile.
-   - It allows the User to have additional attributes specific to being a Company, such as a company name, website, logo, and description.
-
-3. **JobSeeker - Education Relationship:**
-   - A JobSeeker can have zero or more Education entities.
-   - This relationship represents the educational background of a Job Seeker.
-   - It allows the Job Seeker to store information such as the institution, degree, field of study, and dates of education.
-
-4. **JobSeeker - Experience Relationship:**
-   - A JobSeeker can have zero or more Experience entities.
-   - This relationship represents the professional experience of a Job Seeker.
-   - It allows the Job Seeker to store information such as job titles, company names, locations, dates of employment, and job descriptions.
-
-5. **JobSeeker - Application Relationship:**
-   - A JobSeeker can apply to zero or more Job entities.
-   - This relationship represents the applications made by a Job Seeker for different jobs.
-   - It allows the Job Seeker to store application details such as a cover letter, resume, application status, and timestamps.
-
-6. **Company - Job Relationship:**
-   - A Company can post zero or more Job entities.
-   - This relationship represents the job listings posted by a Company.
-   - It allows the Company to provide details about the job, including the job title, description, requirements, location, salary, and timestamps.
-
-These relationships define the associations and dependencies between the entities in the database schema, enabling the job board website to maintain structured data and support various operations related to job seekers, companies, education, experience, job applications, and job postings.
-
-
-## Why User Parent entity 
-
-Advantages of having a parent "User" entity:
-
-Code reusability: If there are common attributes between Job Seekers and Companies (such as name, email, phone), having a shared parent entity allows you to define and manage those attributes in one place, promoting code reuse and reducing redundancy.
-Simplified authentication and authorization: With a shared "User" entity, you can have a single authentication and authorization system that can handle both Job Seekers and Companies.
-Flexibility for future role additions: If you anticipate the need to add more user roles or entities in the future, having a parent "User" entity provides a foundation to easily accommodate those roles.
-
-
-
-```mermaid
-classDiagram
-    class JobSeeker {
-      +id : int
-      +name : string
-      +email : string
-      +phone : string
-      +resume : string
-      +skills : string[]
-      +created_at : datetime
-      +updated_at : datetime
+erDiagram
+    User ||--o{ JobSeeker : Owns
+    User ||--o{ Company : Owns
+    User ||--o{ Messages : Sender
+    User ||--o{ Messages : Receiver
+    User {
+        int id
+        string name
+        string email
+        string phone
+        string role
+        timestamp created_at
+        timestamp updated_at
     }
 
-    class Company {
-      +id : int
-      +name : string
-      +email : string
-      +phone : string
-      +website : string
-      +logo : string
-      +description : string
-      +created_at : datetime
-      +updated_at : datetime
+    JobSeeker {
+        int id
+        int user_id
+        string resume
+        timestamp created_at
+        timestamp updated_at
     }
 
-    class Education {
-      +id : int
-      +institution : string
-      +degree : string
-      +field_of_study : string
-      +start_date : date
-      +end_date : date
-      +created_at : datetime
-      +updated_at : datetime
+    Company {
+        int id
+        int user_id
+        string name
+        string email
+        string phone
+        string website
+        string logo
+        text description
+        timestamp created_at
+        timestamp updated_at
     }
 
-    class Experience {
-      +id : int
-      +title : string
-      +company : string
-      +location : string
-      +start_date : date
-      +end_date : date
-      +description : string
-      +created_at : datetime
-      +updated_at : datetime
+    Institution {
+        int id
+        string name
     }
 
-    class Job {
-      +id : int
-      +title : string
-      +description : string
-      +requirements : string
-      +location : string
-      +salary : decimal
-      +company_id : int
-      +created_at : datetime
-      +updated_at : datetime
+    CompanyEntity {
+        int id
+        string name
     }
 
-    class Application {
-      +id : int
-      +job_seeker_id : int
-      +job_id : int
-      +cover_letter : string
-      +resume : string
-      +status : string
-      +created_at : datetime
-      +updated_at : datetime
+    JobCategory {
+        int id
+        string name
     }
 
-    JobSeeker "1" -- "0..*" Education : has
-    JobSeeker "1" -- "0..*" Experience : has
-    JobSeeker "0..*" -- "0..*" Application : applies to
-    Company "1" -- "0..*" Job : posts
-    JobSeeker "0..*" -- "0..*" Job : applies
-```
+    ExperienceType {
+        int id
+        string name
+    }
+
+    Education {
+        int id
+        int job_seeker_id
+        int institution_id
+        string degree
+        string field_of_study
+        date start_date
+        date end_date
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    Experience {
+        int id
+        int job_seeker_id
+        string title
+        int company_id
+        string location
+        date start_date
+        date end_date
+        int type_id
+        text description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    Job {
+        int id
+        string title
+        text description
+        text requirements
+        string location
+        int salary
+        int company_id
+        int category_id
+        job_status status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    Application {
+        int id
+        int job_seeker_id
+        int job_id
+        text cover_letter
+        string resume
+        application_status status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    Skill {
+        int id
+        string name
+    }
+
+    JobSeekerSkill {
+        int job_seeker_id
+        int skill_id
+    }
+
+    JobViews {
+        int job_id
+        int view_count
+    }
+
+    ChatbotInterview {
+        int id
+        int job_seeker_id
+        int job_id
+        interview_status status
+        text review
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ChatbotConversation {
+        int id
+        int chatbot_interview_id
+        string sender_type
+        text content
+        timestamp created_at
+    }
+
+    Messages {
+        int id
+        int sender_id
+        int receiver_id
+        text content
+        string sender_type
+        timestamp created_at
+    }
+
+    ScheduledInterview {
+        int id
+        int job_seeker_id
+        int company_id
+        timestamp scheduled_at
+        string location
+        text notes
+        string meeting_link
+        timestamp created_at
+    }
+
+    User }|..|{ JobSeeker : "Has"
+    User }|..|{ Company : "Has"
+    User }|..|{ Messages : "Sent"
+    User }|..|{ Messages : "Received"
+    JobSeeker }|--|| ExperienceType : "Has"
+    JobSeeker }|--|| Education : "Has"
+    JobSeeker }|..|{ Application : "Applied"
+    JobSeeker }|..|{ JobSeekerSkill : "Has"
+    JobSeeker }|--|| Experience : "Has"
+    Experience }|--|| CompanyEntity : "At"
+    Experience }|--|| ExperienceType : "Type"
+    Company }|--|| CompanyEntity : "Has"
+    Job }|--|| Company : "Posted by"
+    Job }|--|| JobCategory : "Belongs to"
+    Application }|--|| Job : "Application for"
+    JobSeekerSkill }|--|| Skill : "Skill"
+    Job }|..|{ JobViews : "Viewed"
+    ChatbotInterview }|..|{ ChatbotConversation : "Has"
+    JobSeeker }|..|{ ChatbotInterview : "Participated"
+    Job }|..|{ ChatbotInterview : "Conducted for"
+    User }|..|{ ScheduledInterview : "Participates"
+    Company }|..|{ ScheduledInterview : "Schedules"

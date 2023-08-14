@@ -24,26 +24,26 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
-	if q.createCompanyStmt, err = db.PrepareContext(ctx, createCompany); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateCompany: %w", err)
-	}
-	if q.createEducationStmt, err = db.PrepareContext(ctx, createEducation); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateEducation: %w", err)
-	}
-	if q.createExperienceStmt, err = db.PrepareContext(ctx, createExperience); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateExperience: %w", err)
-	}
 	if q.createJobStmt, err = db.PrepareContext(ctx, createJob); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateJob: %w", err)
 	}
 	if q.createJobSeekerStmt, err = db.PrepareContext(ctx, createJobSeeker); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateJobSeeker: %w", err)
 	}
-	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
+	if q.deleteApplicationStmt, err = db.PrepareContext(ctx, deleteApplication); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteApplication: %w", err)
+	}
+	if q.deleteChatbotConversationStmt, err = db.PrepareContext(ctx, deleteChatbotConversation); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteChatbotConversation: %w", err)
+	}
+	if q.deleteChatbotInterviewStmt, err = db.PrepareContext(ctx, deleteChatbotInterview); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteChatbotInterview: %w", err)
 	}
 	if q.deleteCompanyStmt, err = db.PrepareContext(ctx, deleteCompany); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteCompany: %w", err)
+	}
+	if q.deleteCompanyEntityStmt, err = db.PrepareContext(ctx, deleteCompanyEntity); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteCompanyEntity: %w", err)
 	}
 	if q.deleteEducationStmt, err = db.PrepareContext(ctx, deleteEducation); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteEducation: %w", err)
@@ -51,23 +51,38 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteExperienceStmt, err = db.PrepareContext(ctx, deleteExperience); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteExperience: %w", err)
 	}
+	if q.deleteExperienceTypeStmt, err = db.PrepareContext(ctx, deleteExperienceType); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteExperienceType: %w", err)
+	}
+	if q.deleteInstitutionStmt, err = db.PrepareContext(ctx, deleteInstitution); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteInstitution: %w", err)
+	}
 	if q.deleteJobStmt, err = db.PrepareContext(ctx, deleteJob); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteJob: %w", err)
+	}
+	if q.deleteJobCategoryStmt, err = db.PrepareContext(ctx, deleteJobCategory); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteJobCategory: %w", err)
 	}
 	if q.deleteJobSeekerStmt, err = db.PrepareContext(ctx, deleteJobSeeker); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteJobSeeker: %w", err)
 	}
+	if q.deleteJobSeekerSkillStmt, err = db.PrepareContext(ctx, deleteJobSeekerSkill); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteJobSeekerSkill: %w", err)
+	}
+	if q.deleteMessageStmt, err = db.PrepareContext(ctx, deleteMessage); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteMessage: %w", err)
+	}
+	if q.deleteScheduledInterviewStmt, err = db.PrepareContext(ctx, deleteScheduledInterview); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteScheduledInterview: %w", err)
+	}
+	if q.deleteSkillStmt, err = db.PrepareContext(ctx, deleteSkill); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteSkill: %w", err)
+	}
 	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
 	}
-	if q.getCompaniesStmt, err = db.PrepareContext(ctx, getCompanies); err != nil {
-		return nil, fmt.Errorf("error preparing query GetCompanies: %w", err)
-	}
 	if q.getEducationsStmt, err = db.PrepareContext(ctx, getEducations); err != nil {
 		return nil, fmt.Errorf("error preparing query GetEducations: %w", err)
-	}
-	if q.getExperiencesStmt, err = db.PrepareContext(ctx, getExperiences); err != nil {
-		return nil, fmt.Errorf("error preparing query GetExperiences: %w", err)
 	}
 	if q.getJobSeekersStmt, err = db.PrepareContext(ctx, getJobSeekers); err != nil {
 		return nil, fmt.Errorf("error preparing query GetJobSeekers: %w", err)
@@ -75,11 +90,155 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getJobsStmt, err = db.PrepareContext(ctx, getJobs); err != nil {
 		return nil, fmt.Errorf("error preparing query GetJobs: %w", err)
 	}
-	if q.getUsersStmt, err = db.PrepareContext(ctx, getUsers); err != nil {
-		return nil, fmt.Errorf("error preparing query GetUsers: %w", err)
+	if q.insertApplicationStmt, err = db.PrepareContext(ctx, insertApplication); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertApplication: %w", err)
+	}
+	if q.insertChatbotConversationStmt, err = db.PrepareContext(ctx, insertChatbotConversation); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertChatbotConversation: %w", err)
+	}
+	if q.insertChatbotInterviewStmt, err = db.PrepareContext(ctx, insertChatbotInterview); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertChatbotInterview: %w", err)
+	}
+	if q.insertCompanyStmt, err = db.PrepareContext(ctx, insertCompany); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertCompany: %w", err)
+	}
+	if q.insertCompanyEntityStmt, err = db.PrepareContext(ctx, insertCompanyEntity); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertCompanyEntity: %w", err)
+	}
+	if q.insertEducationStmt, err = db.PrepareContext(ctx, insertEducation); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertEducation: %w", err)
+	}
+	if q.insertExperienceStmt, err = db.PrepareContext(ctx, insertExperience); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertExperience: %w", err)
+	}
+	if q.insertExperienceTypeStmt, err = db.PrepareContext(ctx, insertExperienceType); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertExperienceType: %w", err)
+	}
+	if q.insertInstitutionStmt, err = db.PrepareContext(ctx, insertInstitution); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertInstitution: %w", err)
+	}
+	if q.insertJobCategoryStmt, err = db.PrepareContext(ctx, insertJobCategory); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertJobCategory: %w", err)
+	}
+	if q.insertJobSeekerSkillStmt, err = db.PrepareContext(ctx, insertJobSeekerSkill); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertJobSeekerSkill: %w", err)
+	}
+	if q.insertJobViewStmt, err = db.PrepareContext(ctx, insertJobView); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertJobView: %w", err)
+	}
+	if q.insertMessageStmt, err = db.PrepareContext(ctx, insertMessage); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertMessage: %w", err)
+	}
+	if q.insertScheduledInterviewStmt, err = db.PrepareContext(ctx, insertScheduledInterview); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertScheduledInterview: %w", err)
+	}
+	if q.insertSkillStmt, err = db.PrepareContext(ctx, insertSkill); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertSkill: %w", err)
+	}
+	if q.insertUserStmt, err = db.PrepareContext(ctx, insertUser); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertUser: %w", err)
+	}
+	if q.selectAllApplicationsStmt, err = db.PrepareContext(ctx, selectAllApplications); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllApplications: %w", err)
+	}
+	if q.selectAllChatbotConversationsStmt, err = db.PrepareContext(ctx, selectAllChatbotConversations); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllChatbotConversations: %w", err)
+	}
+	if q.selectAllChatbotInterviewsStmt, err = db.PrepareContext(ctx, selectAllChatbotInterviews); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllChatbotInterviews: %w", err)
+	}
+	if q.selectAllCompaniesStmt, err = db.PrepareContext(ctx, selectAllCompanies); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllCompanies: %w", err)
+	}
+	if q.selectAllCompanyEntitiesStmt, err = db.PrepareContext(ctx, selectAllCompanyEntities); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllCompanyEntities: %w", err)
+	}
+	if q.selectAllExperienceTypesStmt, err = db.PrepareContext(ctx, selectAllExperienceTypes); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllExperienceTypes: %w", err)
+	}
+	if q.selectAllExperiencesStmt, err = db.PrepareContext(ctx, selectAllExperiences); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllExperiences: %w", err)
+	}
+	if q.selectAllInstitutionsStmt, err = db.PrepareContext(ctx, selectAllInstitutions); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllInstitutions: %w", err)
+	}
+	if q.selectAllJobCategoriesStmt, err = db.PrepareContext(ctx, selectAllJobCategories); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllJobCategories: %w", err)
+	}
+	if q.selectAllScheduledInterviewsStmt, err = db.PrepareContext(ctx, selectAllScheduledInterviews); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllScheduledInterviews: %w", err)
+	}
+	if q.selectAllSkillsStmt, err = db.PrepareContext(ctx, selectAllSkills); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectAllSkills: %w", err)
+	}
+	if q.selectApplicationByIDStmt, err = db.PrepareContext(ctx, selectApplicationByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectApplicationByID: %w", err)
+	}
+	if q.selectChatbotConversationsByInterviewIDStmt, err = db.PrepareContext(ctx, selectChatbotConversationsByInterviewID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectChatbotConversationsByInterviewID: %w", err)
+	}
+	if q.selectChatbotInterviewByIDStmt, err = db.PrepareContext(ctx, selectChatbotInterviewByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectChatbotInterviewByID: %w", err)
+	}
+	if q.selectCompanyByIDStmt, err = db.PrepareContext(ctx, selectCompanyByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectCompanyByID: %w", err)
+	}
+	if q.selectCompanyEntityByIDStmt, err = db.PrepareContext(ctx, selectCompanyEntityByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectCompanyEntityByID: %w", err)
+	}
+	if q.selectExperienceByIDStmt, err = db.PrepareContext(ctx, selectExperienceByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectExperienceByID: %w", err)
+	}
+	if q.selectExperienceTypeByIDStmt, err = db.PrepareContext(ctx, selectExperienceTypeByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectExperienceTypeByID: %w", err)
+	}
+	if q.selectInstitutionByIDStmt, err = db.PrepareContext(ctx, selectInstitutionByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectInstitutionByID: %w", err)
+	}
+	if q.selectJobCategoryByIDStmt, err = db.PrepareContext(ctx, selectJobCategoryByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectJobCategoryByID: %w", err)
+	}
+	if q.selectJobSeekerSkillsByJobSeekerIDStmt, err = db.PrepareContext(ctx, selectJobSeekerSkillsByJobSeekerID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectJobSeekerSkillsByJobSeekerID: %w", err)
+	}
+	if q.selectJobViewsByJobIDStmt, err = db.PrepareContext(ctx, selectJobViewsByJobID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectJobViewsByJobID: %w", err)
+	}
+	if q.selectMessagesBySenderAndReceiverStmt, err = db.PrepareContext(ctx, selectMessagesBySenderAndReceiver); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectMessagesBySenderAndReceiver: %w", err)
+	}
+	if q.selectScheduledInterviewByCompanyIDStmt, err = db.PrepareContext(ctx, selectScheduledInterviewByCompanyID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectScheduledInterviewByCompanyID: %w", err)
+	}
+	if q.selectScheduledInterviewByIDStmt, err = db.PrepareContext(ctx, selectScheduledInterviewByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectScheduledInterviewByID: %w", err)
+	}
+	if q.selectScheduledInterviewByJobSeekerIDStmt, err = db.PrepareContext(ctx, selectScheduledInterviewByJobSeekerID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectScheduledInterviewByJobSeekerID: %w", err)
+	}
+	if q.selectSkillByIDStmt, err = db.PrepareContext(ctx, selectSkillByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectSkillByID: %w", err)
+	}
+	if q.selectUserByIDStmt, err = db.PrepareContext(ctx, selectUserByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectUserByID: %w", err)
+	}
+	if q.selectUsersStmt, err = db.PrepareContext(ctx, selectUsers); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectUsers: %w", err)
+	}
+	if q.updateApplicationStmt, err = db.PrepareContext(ctx, updateApplication); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateApplication: %w", err)
+	}
+	if q.updateChatbotConversationStmt, err = db.PrepareContext(ctx, updateChatbotConversation); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateChatbotConversation: %w", err)
+	}
+	if q.updateChatbotInterviewStmt, err = db.PrepareContext(ctx, updateChatbotInterview); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateChatbotInterview: %w", err)
 	}
 	if q.updateCompanyStmt, err = db.PrepareContext(ctx, updateCompany); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateCompany: %w", err)
+	}
+	if q.updateCompanyEntityStmt, err = db.PrepareContext(ctx, updateCompanyEntity); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateCompanyEntity: %w", err)
 	}
 	if q.updateEducationStmt, err = db.PrepareContext(ctx, updateEducation); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateEducation: %w", err)
@@ -87,11 +246,29 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateExperienceStmt, err = db.PrepareContext(ctx, updateExperience); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateExperience: %w", err)
 	}
+	if q.updateExperienceTypeStmt, err = db.PrepareContext(ctx, updateExperienceType); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateExperienceType: %w", err)
+	}
+	if q.updateInstitutionStmt, err = db.PrepareContext(ctx, updateInstitution); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateInstitution: %w", err)
+	}
 	if q.updateJobStmt, err = db.PrepareContext(ctx, updateJob); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateJob: %w", err)
 	}
+	if q.updateJobCategoryStmt, err = db.PrepareContext(ctx, updateJobCategory); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateJobCategory: %w", err)
+	}
 	if q.updateJobSeekerStmt, err = db.PrepareContext(ctx, updateJobSeeker); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateJobSeeker: %w", err)
+	}
+	if q.updateJobViewsStmt, err = db.PrepareContext(ctx, updateJobViews); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateJobViews: %w", err)
+	}
+	if q.updateScheduledInterviewStmt, err = db.PrepareContext(ctx, updateScheduledInterview); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateScheduledInterview: %w", err)
+	}
+	if q.updateSkillStmt, err = db.PrepareContext(ctx, updateSkill); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateSkill: %w", err)
 	}
 	if q.updateUserStmt, err = db.PrepareContext(ctx, updateUser); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUser: %w", err)
@@ -101,21 +278,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
-	if q.createCompanyStmt != nil {
-		if cerr := q.createCompanyStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createCompanyStmt: %w", cerr)
-		}
-	}
-	if q.createEducationStmt != nil {
-		if cerr := q.createEducationStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createEducationStmt: %w", cerr)
-		}
-	}
-	if q.createExperienceStmt != nil {
-		if cerr := q.createExperienceStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createExperienceStmt: %w", cerr)
-		}
-	}
 	if q.createJobStmt != nil {
 		if cerr := q.createJobStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createJobStmt: %w", cerr)
@@ -126,14 +288,29 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createJobSeekerStmt: %w", cerr)
 		}
 	}
-	if q.createUserStmt != nil {
-		if cerr := q.createUserStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
+	if q.deleteApplicationStmt != nil {
+		if cerr := q.deleteApplicationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteApplicationStmt: %w", cerr)
+		}
+	}
+	if q.deleteChatbotConversationStmt != nil {
+		if cerr := q.deleteChatbotConversationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteChatbotConversationStmt: %w", cerr)
+		}
+	}
+	if q.deleteChatbotInterviewStmt != nil {
+		if cerr := q.deleteChatbotInterviewStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteChatbotInterviewStmt: %w", cerr)
 		}
 	}
 	if q.deleteCompanyStmt != nil {
 		if cerr := q.deleteCompanyStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteCompanyStmt: %w", cerr)
+		}
+	}
+	if q.deleteCompanyEntityStmt != nil {
+		if cerr := q.deleteCompanyEntityStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteCompanyEntityStmt: %w", cerr)
 		}
 	}
 	if q.deleteEducationStmt != nil {
@@ -146,9 +323,24 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteExperienceStmt: %w", cerr)
 		}
 	}
+	if q.deleteExperienceTypeStmt != nil {
+		if cerr := q.deleteExperienceTypeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteExperienceTypeStmt: %w", cerr)
+		}
+	}
+	if q.deleteInstitutionStmt != nil {
+		if cerr := q.deleteInstitutionStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteInstitutionStmt: %w", cerr)
+		}
+	}
 	if q.deleteJobStmt != nil {
 		if cerr := q.deleteJobStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteJobStmt: %w", cerr)
+		}
+	}
+	if q.deleteJobCategoryStmt != nil {
+		if cerr := q.deleteJobCategoryStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteJobCategoryStmt: %w", cerr)
 		}
 	}
 	if q.deleteJobSeekerStmt != nil {
@@ -156,24 +348,34 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteJobSeekerStmt: %w", cerr)
 		}
 	}
+	if q.deleteJobSeekerSkillStmt != nil {
+		if cerr := q.deleteJobSeekerSkillStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteJobSeekerSkillStmt: %w", cerr)
+		}
+	}
+	if q.deleteMessageStmt != nil {
+		if cerr := q.deleteMessageStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteMessageStmt: %w", cerr)
+		}
+	}
+	if q.deleteScheduledInterviewStmt != nil {
+		if cerr := q.deleteScheduledInterviewStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteScheduledInterviewStmt: %w", cerr)
+		}
+	}
+	if q.deleteSkillStmt != nil {
+		if cerr := q.deleteSkillStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteSkillStmt: %w", cerr)
+		}
+	}
 	if q.deleteUserStmt != nil {
 		if cerr := q.deleteUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
 		}
 	}
-	if q.getCompaniesStmt != nil {
-		if cerr := q.getCompaniesStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getCompaniesStmt: %w", cerr)
-		}
-	}
 	if q.getEducationsStmt != nil {
 		if cerr := q.getEducationsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getEducationsStmt: %w", cerr)
-		}
-	}
-	if q.getExperiencesStmt != nil {
-		if cerr := q.getExperiencesStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getExperiencesStmt: %w", cerr)
 		}
 	}
 	if q.getJobSeekersStmt != nil {
@@ -186,14 +388,254 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getJobsStmt: %w", cerr)
 		}
 	}
-	if q.getUsersStmt != nil {
-		if cerr := q.getUsersStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getUsersStmt: %w", cerr)
+	if q.insertApplicationStmt != nil {
+		if cerr := q.insertApplicationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertApplicationStmt: %w", cerr)
+		}
+	}
+	if q.insertChatbotConversationStmt != nil {
+		if cerr := q.insertChatbotConversationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertChatbotConversationStmt: %w", cerr)
+		}
+	}
+	if q.insertChatbotInterviewStmt != nil {
+		if cerr := q.insertChatbotInterviewStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertChatbotInterviewStmt: %w", cerr)
+		}
+	}
+	if q.insertCompanyStmt != nil {
+		if cerr := q.insertCompanyStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertCompanyStmt: %w", cerr)
+		}
+	}
+	if q.insertCompanyEntityStmt != nil {
+		if cerr := q.insertCompanyEntityStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertCompanyEntityStmt: %w", cerr)
+		}
+	}
+	if q.insertEducationStmt != nil {
+		if cerr := q.insertEducationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertEducationStmt: %w", cerr)
+		}
+	}
+	if q.insertExperienceStmt != nil {
+		if cerr := q.insertExperienceStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertExperienceStmt: %w", cerr)
+		}
+	}
+	if q.insertExperienceTypeStmt != nil {
+		if cerr := q.insertExperienceTypeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertExperienceTypeStmt: %w", cerr)
+		}
+	}
+	if q.insertInstitutionStmt != nil {
+		if cerr := q.insertInstitutionStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertInstitutionStmt: %w", cerr)
+		}
+	}
+	if q.insertJobCategoryStmt != nil {
+		if cerr := q.insertJobCategoryStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertJobCategoryStmt: %w", cerr)
+		}
+	}
+	if q.insertJobSeekerSkillStmt != nil {
+		if cerr := q.insertJobSeekerSkillStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertJobSeekerSkillStmt: %w", cerr)
+		}
+	}
+	if q.insertJobViewStmt != nil {
+		if cerr := q.insertJobViewStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertJobViewStmt: %w", cerr)
+		}
+	}
+	if q.insertMessageStmt != nil {
+		if cerr := q.insertMessageStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertMessageStmt: %w", cerr)
+		}
+	}
+	if q.insertScheduledInterviewStmt != nil {
+		if cerr := q.insertScheduledInterviewStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertScheduledInterviewStmt: %w", cerr)
+		}
+	}
+	if q.insertSkillStmt != nil {
+		if cerr := q.insertSkillStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertSkillStmt: %w", cerr)
+		}
+	}
+	if q.insertUserStmt != nil {
+		if cerr := q.insertUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertUserStmt: %w", cerr)
+		}
+	}
+	if q.selectAllApplicationsStmt != nil {
+		if cerr := q.selectAllApplicationsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllApplicationsStmt: %w", cerr)
+		}
+	}
+	if q.selectAllChatbotConversationsStmt != nil {
+		if cerr := q.selectAllChatbotConversationsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllChatbotConversationsStmt: %w", cerr)
+		}
+	}
+	if q.selectAllChatbotInterviewsStmt != nil {
+		if cerr := q.selectAllChatbotInterviewsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllChatbotInterviewsStmt: %w", cerr)
+		}
+	}
+	if q.selectAllCompaniesStmt != nil {
+		if cerr := q.selectAllCompaniesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllCompaniesStmt: %w", cerr)
+		}
+	}
+	if q.selectAllCompanyEntitiesStmt != nil {
+		if cerr := q.selectAllCompanyEntitiesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllCompanyEntitiesStmt: %w", cerr)
+		}
+	}
+	if q.selectAllExperienceTypesStmt != nil {
+		if cerr := q.selectAllExperienceTypesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllExperienceTypesStmt: %w", cerr)
+		}
+	}
+	if q.selectAllExperiencesStmt != nil {
+		if cerr := q.selectAllExperiencesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllExperiencesStmt: %w", cerr)
+		}
+	}
+	if q.selectAllInstitutionsStmt != nil {
+		if cerr := q.selectAllInstitutionsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllInstitutionsStmt: %w", cerr)
+		}
+	}
+	if q.selectAllJobCategoriesStmt != nil {
+		if cerr := q.selectAllJobCategoriesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllJobCategoriesStmt: %w", cerr)
+		}
+	}
+	if q.selectAllScheduledInterviewsStmt != nil {
+		if cerr := q.selectAllScheduledInterviewsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllScheduledInterviewsStmt: %w", cerr)
+		}
+	}
+	if q.selectAllSkillsStmt != nil {
+		if cerr := q.selectAllSkillsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectAllSkillsStmt: %w", cerr)
+		}
+	}
+	if q.selectApplicationByIDStmt != nil {
+		if cerr := q.selectApplicationByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectApplicationByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectChatbotConversationsByInterviewIDStmt != nil {
+		if cerr := q.selectChatbotConversationsByInterviewIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectChatbotConversationsByInterviewIDStmt: %w", cerr)
+		}
+	}
+	if q.selectChatbotInterviewByIDStmt != nil {
+		if cerr := q.selectChatbotInterviewByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectChatbotInterviewByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectCompanyByIDStmt != nil {
+		if cerr := q.selectCompanyByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectCompanyByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectCompanyEntityByIDStmt != nil {
+		if cerr := q.selectCompanyEntityByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectCompanyEntityByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectExperienceByIDStmt != nil {
+		if cerr := q.selectExperienceByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectExperienceByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectExperienceTypeByIDStmt != nil {
+		if cerr := q.selectExperienceTypeByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectExperienceTypeByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectInstitutionByIDStmt != nil {
+		if cerr := q.selectInstitutionByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectInstitutionByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectJobCategoryByIDStmt != nil {
+		if cerr := q.selectJobCategoryByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectJobCategoryByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectJobSeekerSkillsByJobSeekerIDStmt != nil {
+		if cerr := q.selectJobSeekerSkillsByJobSeekerIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectJobSeekerSkillsByJobSeekerIDStmt: %w", cerr)
+		}
+	}
+	if q.selectJobViewsByJobIDStmt != nil {
+		if cerr := q.selectJobViewsByJobIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectJobViewsByJobIDStmt: %w", cerr)
+		}
+	}
+	if q.selectMessagesBySenderAndReceiverStmt != nil {
+		if cerr := q.selectMessagesBySenderAndReceiverStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectMessagesBySenderAndReceiverStmt: %w", cerr)
+		}
+	}
+	if q.selectScheduledInterviewByCompanyIDStmt != nil {
+		if cerr := q.selectScheduledInterviewByCompanyIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectScheduledInterviewByCompanyIDStmt: %w", cerr)
+		}
+	}
+	if q.selectScheduledInterviewByIDStmt != nil {
+		if cerr := q.selectScheduledInterviewByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectScheduledInterviewByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectScheduledInterviewByJobSeekerIDStmt != nil {
+		if cerr := q.selectScheduledInterviewByJobSeekerIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectScheduledInterviewByJobSeekerIDStmt: %w", cerr)
+		}
+	}
+	if q.selectSkillByIDStmt != nil {
+		if cerr := q.selectSkillByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectSkillByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectUserByIDStmt != nil {
+		if cerr := q.selectUserByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectUserByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectUsersStmt != nil {
+		if cerr := q.selectUsersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectUsersStmt: %w", cerr)
+		}
+	}
+	if q.updateApplicationStmt != nil {
+		if cerr := q.updateApplicationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateApplicationStmt: %w", cerr)
+		}
+	}
+	if q.updateChatbotConversationStmt != nil {
+		if cerr := q.updateChatbotConversationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateChatbotConversationStmt: %w", cerr)
+		}
+	}
+	if q.updateChatbotInterviewStmt != nil {
+		if cerr := q.updateChatbotInterviewStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateChatbotInterviewStmt: %w", cerr)
 		}
 	}
 	if q.updateCompanyStmt != nil {
 		if cerr := q.updateCompanyStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateCompanyStmt: %w", cerr)
+		}
+	}
+	if q.updateCompanyEntityStmt != nil {
+		if cerr := q.updateCompanyEntityStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateCompanyEntityStmt: %w", cerr)
 		}
 	}
 	if q.updateEducationStmt != nil {
@@ -206,14 +648,44 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateExperienceStmt: %w", cerr)
 		}
 	}
+	if q.updateExperienceTypeStmt != nil {
+		if cerr := q.updateExperienceTypeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateExperienceTypeStmt: %w", cerr)
+		}
+	}
+	if q.updateInstitutionStmt != nil {
+		if cerr := q.updateInstitutionStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateInstitutionStmt: %w", cerr)
+		}
+	}
 	if q.updateJobStmt != nil {
 		if cerr := q.updateJobStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateJobStmt: %w", cerr)
 		}
 	}
+	if q.updateJobCategoryStmt != nil {
+		if cerr := q.updateJobCategoryStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateJobCategoryStmt: %w", cerr)
+		}
+	}
 	if q.updateJobSeekerStmt != nil {
 		if cerr := q.updateJobSeekerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateJobSeekerStmt: %w", cerr)
+		}
+	}
+	if q.updateJobViewsStmt != nil {
+		if cerr := q.updateJobViewsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateJobViewsStmt: %w", cerr)
+		}
+	}
+	if q.updateScheduledInterviewStmt != nil {
+		if cerr := q.updateScheduledInterviewStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateScheduledInterviewStmt: %w", cerr)
+		}
+	}
+	if q.updateSkillStmt != nil {
+		if cerr := q.updateSkillStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateSkillStmt: %w", cerr)
 		}
 	}
 	if q.updateUserStmt != nil {
@@ -258,61 +730,179 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                   DBTX
-	tx                   *sql.Tx
-	createCompanyStmt    *sql.Stmt
-	createEducationStmt  *sql.Stmt
-	createExperienceStmt *sql.Stmt
-	createJobStmt        *sql.Stmt
-	createJobSeekerStmt  *sql.Stmt
-	createUserStmt       *sql.Stmt
-	deleteCompanyStmt    *sql.Stmt
-	deleteEducationStmt  *sql.Stmt
-	deleteExperienceStmt *sql.Stmt
-	deleteJobStmt        *sql.Stmt
-	deleteJobSeekerStmt  *sql.Stmt
-	deleteUserStmt       *sql.Stmt
-	getCompaniesStmt     *sql.Stmt
-	getEducationsStmt    *sql.Stmt
-	getExperiencesStmt   *sql.Stmt
-	getJobSeekersStmt    *sql.Stmt
-	getJobsStmt          *sql.Stmt
-	getUsersStmt         *sql.Stmt
-	updateCompanyStmt    *sql.Stmt
-	updateEducationStmt  *sql.Stmt
-	updateExperienceStmt *sql.Stmt
-	updateJobStmt        *sql.Stmt
-	updateJobSeekerStmt  *sql.Stmt
-	updateUserStmt       *sql.Stmt
+	db                                          DBTX
+	tx                                          *sql.Tx
+	createJobStmt                               *sql.Stmt
+	createJobSeekerStmt                         *sql.Stmt
+	deleteApplicationStmt                       *sql.Stmt
+	deleteChatbotConversationStmt               *sql.Stmt
+	deleteChatbotInterviewStmt                  *sql.Stmt
+	deleteCompanyStmt                           *sql.Stmt
+	deleteCompanyEntityStmt                     *sql.Stmt
+	deleteEducationStmt                         *sql.Stmt
+	deleteExperienceStmt                        *sql.Stmt
+	deleteExperienceTypeStmt                    *sql.Stmt
+	deleteInstitutionStmt                       *sql.Stmt
+	deleteJobStmt                               *sql.Stmt
+	deleteJobCategoryStmt                       *sql.Stmt
+	deleteJobSeekerStmt                         *sql.Stmt
+	deleteJobSeekerSkillStmt                    *sql.Stmt
+	deleteMessageStmt                           *sql.Stmt
+	deleteScheduledInterviewStmt                *sql.Stmt
+	deleteSkillStmt                             *sql.Stmt
+	deleteUserStmt                              *sql.Stmt
+	getEducationsStmt                           *sql.Stmt
+	getJobSeekersStmt                           *sql.Stmt
+	getJobsStmt                                 *sql.Stmt
+	insertApplicationStmt                       *sql.Stmt
+	insertChatbotConversationStmt               *sql.Stmt
+	insertChatbotInterviewStmt                  *sql.Stmt
+	insertCompanyStmt                           *sql.Stmt
+	insertCompanyEntityStmt                     *sql.Stmt
+	insertEducationStmt                         *sql.Stmt
+	insertExperienceStmt                        *sql.Stmt
+	insertExperienceTypeStmt                    *sql.Stmt
+	insertInstitutionStmt                       *sql.Stmt
+	insertJobCategoryStmt                       *sql.Stmt
+	insertJobSeekerSkillStmt                    *sql.Stmt
+	insertJobViewStmt                           *sql.Stmt
+	insertMessageStmt                           *sql.Stmt
+	insertScheduledInterviewStmt                *sql.Stmt
+	insertSkillStmt                             *sql.Stmt
+	insertUserStmt                              *sql.Stmt
+	selectAllApplicationsStmt                   *sql.Stmt
+	selectAllChatbotConversationsStmt           *sql.Stmt
+	selectAllChatbotInterviewsStmt              *sql.Stmt
+	selectAllCompaniesStmt                      *sql.Stmt
+	selectAllCompanyEntitiesStmt                *sql.Stmt
+	selectAllExperienceTypesStmt                *sql.Stmt
+	selectAllExperiencesStmt                    *sql.Stmt
+	selectAllInstitutionsStmt                   *sql.Stmt
+	selectAllJobCategoriesStmt                  *sql.Stmt
+	selectAllScheduledInterviewsStmt            *sql.Stmt
+	selectAllSkillsStmt                         *sql.Stmt
+	selectApplicationByIDStmt                   *sql.Stmt
+	selectChatbotConversationsByInterviewIDStmt *sql.Stmt
+	selectChatbotInterviewByIDStmt              *sql.Stmt
+	selectCompanyByIDStmt                       *sql.Stmt
+	selectCompanyEntityByIDStmt                 *sql.Stmt
+	selectExperienceByIDStmt                    *sql.Stmt
+	selectExperienceTypeByIDStmt                *sql.Stmt
+	selectInstitutionByIDStmt                   *sql.Stmt
+	selectJobCategoryByIDStmt                   *sql.Stmt
+	selectJobSeekerSkillsByJobSeekerIDStmt      *sql.Stmt
+	selectJobViewsByJobIDStmt                   *sql.Stmt
+	selectMessagesBySenderAndReceiverStmt       *sql.Stmt
+	selectScheduledInterviewByCompanyIDStmt     *sql.Stmt
+	selectScheduledInterviewByIDStmt            *sql.Stmt
+	selectScheduledInterviewByJobSeekerIDStmt   *sql.Stmt
+	selectSkillByIDStmt                         *sql.Stmt
+	selectUserByIDStmt                          *sql.Stmt
+	selectUsersStmt                             *sql.Stmt
+	updateApplicationStmt                       *sql.Stmt
+	updateChatbotConversationStmt               *sql.Stmt
+	updateChatbotInterviewStmt                  *sql.Stmt
+	updateCompanyStmt                           *sql.Stmt
+	updateCompanyEntityStmt                     *sql.Stmt
+	updateEducationStmt                         *sql.Stmt
+	updateExperienceStmt                        *sql.Stmt
+	updateExperienceTypeStmt                    *sql.Stmt
+	updateInstitutionStmt                       *sql.Stmt
+	updateJobStmt                               *sql.Stmt
+	updateJobCategoryStmt                       *sql.Stmt
+	updateJobSeekerStmt                         *sql.Stmt
+	updateJobViewsStmt                          *sql.Stmt
+	updateScheduledInterviewStmt                *sql.Stmt
+	updateSkillStmt                             *sql.Stmt
+	updateUserStmt                              *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                   tx,
-		tx:                   tx,
-		createCompanyStmt:    q.createCompanyStmt,
-		createEducationStmt:  q.createEducationStmt,
-		createExperienceStmt: q.createExperienceStmt,
-		createJobStmt:        q.createJobStmt,
-		createJobSeekerStmt:  q.createJobSeekerStmt,
-		createUserStmt:       q.createUserStmt,
-		deleteCompanyStmt:    q.deleteCompanyStmt,
-		deleteEducationStmt:  q.deleteEducationStmt,
-		deleteExperienceStmt: q.deleteExperienceStmt,
-		deleteJobStmt:        q.deleteJobStmt,
-		deleteJobSeekerStmt:  q.deleteJobSeekerStmt,
-		deleteUserStmt:       q.deleteUserStmt,
-		getCompaniesStmt:     q.getCompaniesStmt,
-		getEducationsStmt:    q.getEducationsStmt,
-		getExperiencesStmt:   q.getExperiencesStmt,
-		getJobSeekersStmt:    q.getJobSeekersStmt,
-		getJobsStmt:          q.getJobsStmt,
-		getUsersStmt:         q.getUsersStmt,
-		updateCompanyStmt:    q.updateCompanyStmt,
-		updateEducationStmt:  q.updateEducationStmt,
-		updateExperienceStmt: q.updateExperienceStmt,
-		updateJobStmt:        q.updateJobStmt,
-		updateJobSeekerStmt:  q.updateJobSeekerStmt,
-		updateUserStmt:       q.updateUserStmt,
+		db:                                          tx,
+		tx:                                          tx,
+		createJobStmt:                               q.createJobStmt,
+		createJobSeekerStmt:                         q.createJobSeekerStmt,
+		deleteApplicationStmt:                       q.deleteApplicationStmt,
+		deleteChatbotConversationStmt:               q.deleteChatbotConversationStmt,
+		deleteChatbotInterviewStmt:                  q.deleteChatbotInterviewStmt,
+		deleteCompanyStmt:                           q.deleteCompanyStmt,
+		deleteCompanyEntityStmt:                     q.deleteCompanyEntityStmt,
+		deleteEducationStmt:                         q.deleteEducationStmt,
+		deleteExperienceStmt:                        q.deleteExperienceStmt,
+		deleteExperienceTypeStmt:                    q.deleteExperienceTypeStmt,
+		deleteInstitutionStmt:                       q.deleteInstitutionStmt,
+		deleteJobStmt:                               q.deleteJobStmt,
+		deleteJobCategoryStmt:                       q.deleteJobCategoryStmt,
+		deleteJobSeekerStmt:                         q.deleteJobSeekerStmt,
+		deleteJobSeekerSkillStmt:                    q.deleteJobSeekerSkillStmt,
+		deleteMessageStmt:                           q.deleteMessageStmt,
+		deleteScheduledInterviewStmt:                q.deleteScheduledInterviewStmt,
+		deleteSkillStmt:                             q.deleteSkillStmt,
+		deleteUserStmt:                              q.deleteUserStmt,
+		getEducationsStmt:                           q.getEducationsStmt,
+		getJobSeekersStmt:                           q.getJobSeekersStmt,
+		getJobsStmt:                                 q.getJobsStmt,
+		insertApplicationStmt:                       q.insertApplicationStmt,
+		insertChatbotConversationStmt:               q.insertChatbotConversationStmt,
+		insertChatbotInterviewStmt:                  q.insertChatbotInterviewStmt,
+		insertCompanyStmt:                           q.insertCompanyStmt,
+		insertCompanyEntityStmt:                     q.insertCompanyEntityStmt,
+		insertEducationStmt:                         q.insertEducationStmt,
+		insertExperienceStmt:                        q.insertExperienceStmt,
+		insertExperienceTypeStmt:                    q.insertExperienceTypeStmt,
+		insertInstitutionStmt:                       q.insertInstitutionStmt,
+		insertJobCategoryStmt:                       q.insertJobCategoryStmt,
+		insertJobSeekerSkillStmt:                    q.insertJobSeekerSkillStmt,
+		insertJobViewStmt:                           q.insertJobViewStmt,
+		insertMessageStmt:                           q.insertMessageStmt,
+		insertScheduledInterviewStmt:                q.insertScheduledInterviewStmt,
+		insertSkillStmt:                             q.insertSkillStmt,
+		insertUserStmt:                              q.insertUserStmt,
+		selectAllApplicationsStmt:                   q.selectAllApplicationsStmt,
+		selectAllChatbotConversationsStmt:           q.selectAllChatbotConversationsStmt,
+		selectAllChatbotInterviewsStmt:              q.selectAllChatbotInterviewsStmt,
+		selectAllCompaniesStmt:                      q.selectAllCompaniesStmt,
+		selectAllCompanyEntitiesStmt:                q.selectAllCompanyEntitiesStmt,
+		selectAllExperienceTypesStmt:                q.selectAllExperienceTypesStmt,
+		selectAllExperiencesStmt:                    q.selectAllExperiencesStmt,
+		selectAllInstitutionsStmt:                   q.selectAllInstitutionsStmt,
+		selectAllJobCategoriesStmt:                  q.selectAllJobCategoriesStmt,
+		selectAllScheduledInterviewsStmt:            q.selectAllScheduledInterviewsStmt,
+		selectAllSkillsStmt:                         q.selectAllSkillsStmt,
+		selectApplicationByIDStmt:                   q.selectApplicationByIDStmt,
+		selectChatbotConversationsByInterviewIDStmt: q.selectChatbotConversationsByInterviewIDStmt,
+		selectChatbotInterviewByIDStmt:              q.selectChatbotInterviewByIDStmt,
+		selectCompanyByIDStmt:                       q.selectCompanyByIDStmt,
+		selectCompanyEntityByIDStmt:                 q.selectCompanyEntityByIDStmt,
+		selectExperienceByIDStmt:                    q.selectExperienceByIDStmt,
+		selectExperienceTypeByIDStmt:                q.selectExperienceTypeByIDStmt,
+		selectInstitutionByIDStmt:                   q.selectInstitutionByIDStmt,
+		selectJobCategoryByIDStmt:                   q.selectJobCategoryByIDStmt,
+		selectJobSeekerSkillsByJobSeekerIDStmt:      q.selectJobSeekerSkillsByJobSeekerIDStmt,
+		selectJobViewsByJobIDStmt:                   q.selectJobViewsByJobIDStmt,
+		selectMessagesBySenderAndReceiverStmt:       q.selectMessagesBySenderAndReceiverStmt,
+		selectScheduledInterviewByCompanyIDStmt:     q.selectScheduledInterviewByCompanyIDStmt,
+		selectScheduledInterviewByIDStmt:            q.selectScheduledInterviewByIDStmt,
+		selectScheduledInterviewByJobSeekerIDStmt:   q.selectScheduledInterviewByJobSeekerIDStmt,
+		selectSkillByIDStmt:                         q.selectSkillByIDStmt,
+		selectUserByIDStmt:                          q.selectUserByIDStmt,
+		selectUsersStmt:                             q.selectUsersStmt,
+		updateApplicationStmt:                       q.updateApplicationStmt,
+		updateChatbotConversationStmt:               q.updateChatbotConversationStmt,
+		updateChatbotInterviewStmt:                  q.updateChatbotInterviewStmt,
+		updateCompanyStmt:                           q.updateCompanyStmt,
+		updateCompanyEntityStmt:                     q.updateCompanyEntityStmt,
+		updateEducationStmt:                         q.updateEducationStmt,
+		updateExperienceStmt:                        q.updateExperienceStmt,
+		updateExperienceTypeStmt:                    q.updateExperienceTypeStmt,
+		updateInstitutionStmt:                       q.updateInstitutionStmt,
+		updateJobStmt:                               q.updateJobStmt,
+		updateJobCategoryStmt:                       q.updateJobCategoryStmt,
+		updateJobSeekerStmt:                         q.updateJobSeekerStmt,
+		updateJobViewsStmt:                          q.updateJobViewsStmt,
+		updateScheduledInterviewStmt:                q.updateScheduledInterviewStmt,
+		updateSkillStmt:                             q.updateSkillStmt,
+		updateUserStmt:                              q.updateUserStmt,
 	}
 }
