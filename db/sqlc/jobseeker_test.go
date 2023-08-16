@@ -4,18 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomJobSeekerParams(t *testing.T) CreateJobSeekerParams {
-	return CreateJobSeekerParams{
-		UserID:  sql.NullInt32{Int32: int32(gofakeit.Number(1, 1000)), Valid: true},
-	}
+func createRandomJobSeekerUserID(t *testing.T) sql.NullInt32 {
+	return sql.NullInt32{Int32: int32(gofakeit.Number(1, 1000)), Valid: true}
 }
 
 func TestCreateJobSeeker(t *testing.T) {
@@ -23,12 +19,12 @@ func TestCreateJobSeeker(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	param := createRandomJobSeekerParams(t)
-	mock.ExpectExec("INSERT INTO JobSeeker").WithArgs(param.UserID, pq.Array(param.Column2)).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+	userID := createRandomJobSeekerUserID(t)
+	mock.ExpectQuery("INSERT INTO JobSeeker").WithArgs(userID).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
 	q := New(db)
-	_, err = q.CreateJobSeeker(context.TODO(), param)
+	_, err = q.CreateJobSeeker(context.TODO(), userID)
 	require.NoError(t, err)
 }
 
@@ -51,8 +47,8 @@ func TestGetJobSeekers(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "user_id", "skills", "created_at", "updated_at"}).
-		AddRow(1, 1, pq.Array([]string{"skill1", "skill2"}), time.Now(), time.Now())
+	rows := sqlmock.NewRows([]string{"id", "user_id", "created_at", "updated_at"}).
+		AddRow(1, 1, "cover_letter", "resume", "status")
 
 	mock.ExpectQuery("SELECT (.+) FROM JobSeeker").WillReturnRows(rows)
 
@@ -67,11 +63,11 @@ func TestUpdateJobSeeker(t *testing.T) {
 	defer db.Close()
 
 	param := UpdateJobSeekerParams{
-		UserID:  sql.NullInt32{Int32: int32(1), Valid: true},
-		ID:      int32(1),
+		UserID: createRandomJobSeekerUserID(t),
+		ID:     int32(1),
 	}
 
-	mock.ExpectExec("UPDATE JobSeeker SET").WithArgs(param.UserID, pq.Array(param.Column2), param.ID).
+	mock.ExpectExec("UPDATE JobSeeker SET").WithArgs(param.UserID, param.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	q := New(db)

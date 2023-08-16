@@ -141,6 +141,168 @@ func (ns NullJobStatus) Value() (driver.Value, error) {
 	return string(ns.JobStatus), nil
 }
 
+type Passiveskills string
+
+const (
+	PassiveskillsCommunication       Passiveskills = "Communication"
+	PassiveskillsProblemSolving      Passiveskills = "Problem Solving"
+	PassiveskillsTeamwork            Passiveskills = "Teamwork"
+	PassiveskillsAdaptability        Passiveskills = "Adaptability"
+	PassiveskillsCriticalThinking    Passiveskills = "Critical Thinking"
+	PassiveskillsCreativity          Passiveskills = "Creativity"
+	PassiveskillsLeadership          Passiveskills = "Leadership"
+	PassiveskillsTimeManagement      Passiveskills = "Time Management"
+	PassiveskillsAttentiontoDetail   Passiveskills = "Attention to Detail"
+	PassiveskillsDecisionMaking      Passiveskills = "Decision Making"
+	PassiveskillsFlexibility         Passiveskills = "Flexibility"
+	PassiveskillsInitiative          Passiveskills = "Initiative"
+	PassiveskillsInterpersonalSkills Passiveskills = "Interpersonal Skills"
+	PassiveskillsResilience          Passiveskills = "Resilience"
+	PassiveskillsPositiveAttitude    Passiveskills = "Positive Attitude"
+)
+
+func (e *Passiveskills) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Passiveskills(s)
+	case string:
+		*e = Passiveskills(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Passiveskills: %T", src)
+	}
+	return nil
+}
+
+type NullPassiveskills struct {
+	Passiveskills Passiveskills
+	Valid         bool // Valid is true if Passiveskills is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPassiveskills) Scan(value interface{}) error {
+	if value == nil {
+		ns.Passiveskills, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Passiveskills.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPassiveskills) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Passiveskills), nil
+}
+
+type Technicalskills string
+
+const (
+	TechnicalskillsJava                   Technicalskills = "Java"
+	TechnicalskillsPython                 Technicalskills = "Python"
+	TechnicalskillsJavaScript             Technicalskills = "JavaScript"
+	TechnicalskillsC                      Technicalskills = "C++"
+	TechnicalskillsSQL                    Technicalskills = "SQL"
+	TechnicalskillsReact                  Technicalskills = "React"
+	TechnicalskillsAngular                Technicalskills = "Angular"
+	TechnicalskillsVue                    Technicalskills = "Vue"
+	TechnicalskillsSvelte                 Technicalskills = "Svelte"
+	TechnicalskillsNextjs                 Technicalskills = "Next.js"
+	TechnicalskillsNodejs                 Technicalskills = "Node.js"
+	TechnicalskillsExpressjs              Technicalskills = "Express.js"
+	TechnicalskillsDjango                 Technicalskills = "Django"
+	TechnicalskillsFlask                  Technicalskills = "Flask"
+	TechnicalskillsRubyonRails            Technicalskills = "Ruby on Rails"
+	TechnicalskillsSpring                 Technicalskills = "Spring"
+	TechnicalskillsASPNET                 Technicalskills = "ASP.NET"
+	TechnicalskillsTypeScript             Technicalskills = "TypeScript"
+	TechnicalskillsDocker                 Technicalskills = "Docker"
+	TechnicalskillsKubernetes             Technicalskills = "Kubernetes"
+	TechnicalskillsAWS                    Technicalskills = "AWS"
+	TechnicalskillsAzure                  Technicalskills = "Azure"
+	TechnicalskillsGCP                    Technicalskills = "GCP"
+	TechnicalskillsMachineLearning        Technicalskills = "Machine Learning"
+	TechnicalskillsDataAnalysis           Technicalskills = "Data Analysis"
+	TechnicalskillsCyberSecurity          Technicalskills = "Cyber Security"
+	TechnicalskillsSwift                  Technicalskills = "Swift"
+	TechnicalskillsGo                     Technicalskills = "Go"
+	TechnicalskillsDevOps                 Technicalskills = "DevOps"
+	TechnicalskillsHTMLCSS                Technicalskills = "HTML/CSS"
+	TechnicalskillsAgileMethodology       Technicalskills = "Agile Methodology"
+	TechnicalskillsEmbeddedSystems        Technicalskills = "Embedded Systems"
+	TechnicalskillsNetworking             Technicalskills = "Networking"
+	TechnicalskillsVersionControl         Technicalskills = "Version Control"
+	TechnicalskillsAPIDevelopment         Technicalskills = "API Development"
+	TechnicalskillsBlockchain             Technicalskills = "Blockchain"
+	TechnicalskillsTestAutomation         Technicalskills = "Test Automation"
+	TechnicalskillsManualTesting          Technicalskills = "Manual Testing"
+	TechnicalskillsPerformanceTesting     Technicalskills = "Performance Testing"
+	TechnicalskillsCICD                   Technicalskills = "CI/CD"
+	TechnicalskillsScrum                  Technicalskills = "Scrum"
+	TechnicalskillsKanban                 Technicalskills = "Kanban"
+	TechnicalskillsSoftwareArchitecture   Technicalskills = "Software Architecture"
+	TechnicalskillsMicroservices          Technicalskills = "Microservices"
+	TechnicalskillsBigData                Technicalskills = "Big Data"
+	TechnicalskillsIoT                    Technicalskills = "IoT"
+	TechnicalskillsMobileDevelopment      Technicalskills = "Mobile Development"
+	TechnicalskillsUXUIDesign             Technicalskills = "UX/UI Design"
+	TechnicalskillsDatabaseAdministration Technicalskills = "Database Administration"
+	TechnicalskillsWebSecurity            Technicalskills = "Web Security"
+	TechnicalskillsSelenium               Technicalskills = "Selenium"
+	TechnicalskillsJenkins                Technicalskills = "Jenkins"
+	TechnicalskillsGit                    Technicalskills = "Git"
+	TechnicalskillsLinux                  Technicalskills = "Linux"
+	TechnicalskillsServerAdministration   Technicalskills = "Server Administration"
+	TechnicalskillsLaravel                Technicalskills = "Laravel"
+	TechnicalskillsMeteor                 Technicalskills = "Meteor"
+	TechnicalskillsEmber                  Technicalskills = "Ember"
+	TechnicalskillsBackbone               Technicalskills = "Backbone"
+	TechnicalskillsCherryPy               Technicalskills = "CherryPy"
+	TechnicalskillsFastAPI                Technicalskills = "FastAPI"
+	TechnicalskillsSymfony                Technicalskills = "Symfony"
+	TechnicalskillsHibernate              Technicalskills = "Hibernate"
+	TechnicalskillsQt                     Technicalskills = "Qt"
+	TechnicalskillsTensorFlow             Technicalskills = "TensorFlow"
+	TechnicalskillsPyTorch                Technicalskills = "PyTorch"
+	TechnicalskillsRedux                  Technicalskills = "Redux"
+)
+
+func (e *Technicalskills) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Technicalskills(s)
+	case string:
+		*e = Technicalskills(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Technicalskills: %T", src)
+	}
+	return nil
+}
+
+type NullTechnicalskills struct {
+	Technicalskills Technicalskills
+	Valid           bool // Valid is true if Technicalskills is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTechnicalskills) Scan(value interface{}) error {
+	if value == nil {
+		ns.Technicalskills, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Technicalskills.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTechnicalskills) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Technicalskills), nil
+}
+
 type Application struct {
 	ID          int32                 `json:"id"`
 	JobSeekerID sql.NullInt32         `json:"job_seeker_id"`
@@ -246,14 +408,14 @@ type Jobcategory struct {
 type Jobseeker struct {
 	ID        int32         `json:"id"`
 	UserID    sql.NullInt32 `json:"user_id"`
-	Skills    []string      `json:"skills"`
 	CreatedAt sql.NullTime  `json:"created_at"`
 	UpdatedAt sql.NullTime  `json:"updated_at"`
 }
 
 type Jobseekerskill struct {
-	JobSeekerID int32 `json:"job_seeker_id"`
-	SkillID     int32 `json:"skill_id"`
+	JobSeekerID    int32           `json:"job_seeker_id"`
+	TechnicalSkill Technicalskills `json:"technical_skill"`
+	PassiveSkill   Passiveskills   `json:"passive_skill"`
 }
 
 type Jobview struct {

@@ -10,36 +10,40 @@ import (
 )
 
 const deleteJobSeekerSkill = `-- name: DeleteJobSeekerSkill :exec
-DELETE FROM JobSeekerSkill WHERE job_seeker_id = $1 AND skill_id = $2
+DELETE FROM JobSeekerSkill WHERE job_seeker_id = $1 AND technical_skill = $2 AND passive_skill = $3
 `
 
 type DeleteJobSeekerSkillParams struct {
-	JobSeekerID int32 `json:"job_seeker_id"`
-	SkillID     int32 `json:"skill_id"`
+	JobSeekerID    int32           `json:"job_seeker_id"`
+	TechnicalSkill Technicalskills `json:"technical_skill"`
+	PassiveSkill   Passiveskills   `json:"passive_skill"`
 }
 
 func (q *Queries) DeleteJobSeekerSkill(ctx context.Context, arg DeleteJobSeekerSkillParams) error {
-	_, err := q.exec(ctx, q.deleteJobSeekerSkillStmt, deleteJobSeekerSkill, arg.JobSeekerID, arg.SkillID)
+	_, err := q.exec(ctx, q.deleteJobSeekerSkillStmt, deleteJobSeekerSkill, arg.JobSeekerID, arg.TechnicalSkill, arg.PassiveSkill)
 	return err
 }
 
 const insertJobSeekerSkill = `-- name: InsertJobSeekerSkill :exec
-INSERT INTO JobSeekerSkill (job_seeker_id, skill_id)
-VALUES ($1, $2)
+INSERT INTO JobSeekerSkill (job_seeker_id, technical_skill, passive_skill)
+VALUES ($1, $2, $3)
 `
 
 type InsertJobSeekerSkillParams struct {
-	JobSeekerID int32 `json:"job_seeker_id"`
-	SkillID     int32 `json:"skill_id"`
+	JobSeekerID    int32           `json:"job_seeker_id"`
+	TechnicalSkill Technicalskills `json:"technical_skill"`
+	PassiveSkill   Passiveskills   `json:"passive_skill"`
 }
 
 func (q *Queries) InsertJobSeekerSkill(ctx context.Context, arg InsertJobSeekerSkillParams) error {
-	_, err := q.exec(ctx, q.insertJobSeekerSkillStmt, insertJobSeekerSkill, arg.JobSeekerID, arg.SkillID)
+	_, err := q.exec(ctx, q.insertJobSeekerSkillStmt, insertJobSeekerSkill, arg.JobSeekerID, arg.TechnicalSkill, arg.PassiveSkill)
 	return err
 }
 
 const selectJobSeekerSkillsByJobSeekerID = `-- name: SelectJobSeekerSkillsByJobSeekerID :many
-SELECT job_seeker_id, skill_id FROM JobSeekerSkill WHERE job_seeker_id = $1
+SELECT job_seeker_id, technical_skill, passive_skill
+FROM JobSeekerSkill
+WHERE job_seeker_id = $1
 `
 
 func (q *Queries) SelectJobSeekerSkillsByJobSeekerID(ctx context.Context, jobSeekerID int32) ([]Jobseekerskill, error) {
@@ -51,7 +55,7 @@ func (q *Queries) SelectJobSeekerSkillsByJobSeekerID(ctx context.Context, jobSee
 	var items []Jobseekerskill
 	for rows.Next() {
 		var i Jobseekerskill
-		if err := rows.Scan(&i.JobSeekerID, &i.SkillID); err != nil {
+		if err := rows.Scan(&i.JobSeekerID, &i.TechnicalSkill, &i.PassiveSkill); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -8,30 +8,22 @@ package db
 import (
 	"context"
 	"database/sql"
-
-	"github.com/lib/pq"
 )
 
 const createJobSeeker = `-- name: CreateJobSeeker :one
 INSERT INTO JobSeeker (
   user_id,
-  skills,
   created_at,
   updated_at
 ) VALUES (
-  $1, $2,
+  $1,
   CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 ) RETURNING id
 `
 
-type CreateJobSeekerParams struct {
-	UserID sql.NullInt32 `json:"user_id"`
-	Skills []string      `json:"skills"`
-}
-
 // Insert
-func (q *Queries) CreateJobSeeker(ctx context.Context, arg CreateJobSeekerParams) (int32, error) {
-	row := q.queryRow(ctx, q.createJobSeekerStmt, createJobSeeker, arg.UserID, pq.Array(arg.Skills))
+func (q *Queries) CreateJobSeeker(ctx context.Context, userID sql.NullInt32) (int32, error) {
+	row := q.queryRow(ctx, q.createJobSeekerStmt, createJobSeeker, userID)
 	var id int32
 	err := row.Scan(&id)
 	return id, err
@@ -48,7 +40,7 @@ func (q *Queries) DeleteJobSeeker(ctx context.Context, id int32) error {
 }
 
 const getJobSeekers = `-- name: GetJobSeekers :many
-SELECT id, user_id, skills, created_at, updated_at FROM JobSeeker
+SELECT id, user_id, created_at, updated_at FROM JobSeeker
 `
 
 // Select all
@@ -64,7 +56,6 @@ func (q *Queries) GetJobSeekers(ctx context.Context) ([]Jobseeker, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
-			pq.Array(&i.Skills),
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -82,17 +73,16 @@ func (q *Queries) GetJobSeekers(ctx context.Context) ([]Jobseeker, error) {
 }
 
 const updateJobSeeker = `-- name: UpdateJobSeeker :exec
-UPDATE JobSeeker SET user_id = $1, skills = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3
+UPDATE JobSeeker SET user_id = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2
 `
 
 type UpdateJobSeekerParams struct {
 	UserID sql.NullInt32 `json:"user_id"`
-	Skills []string      `json:"skills"`
 	ID     int32         `json:"id"`
 }
 
 // Update
 func (q *Queries) UpdateJobSeeker(ctx context.Context, arg UpdateJobSeekerParams) error {
-	_, err := q.exec(ctx, q.updateJobSeekerStmt, updateJobSeeker, arg.UserID, pq.Array(arg.Skills), arg.ID)
+	_, err := q.exec(ctx, q.updateJobSeekerStmt, updateJobSeeker, arg.UserID, arg.ID)
 	return err
 }
