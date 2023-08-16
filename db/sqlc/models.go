@@ -244,12 +244,11 @@ type Jobcategory struct {
 }
 
 type Jobseeker struct {
-	ID        int32          `json:"id"`
-	UserID    sql.NullInt32  `json:"user_id"`
-	Resume    sql.NullString `json:"resume"`
-	Skills    []string       `json:"skills"`
-	CreatedAt sql.NullTime   `json:"created_at"`
-	UpdatedAt sql.NullTime   `json:"updated_at"`
+	ID        int32         `json:"id"`
+	UserID    sql.NullInt32 `json:"user_id"`
+	Skills    []string      `json:"skills"`
+	CreatedAt sql.NullTime  `json:"created_at"`
+	UpdatedAt sql.NullTime  `json:"updated_at"`
 }
 
 type Jobseekerskill struct {

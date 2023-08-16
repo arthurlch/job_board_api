@@ -13,29 +13,25 @@ import (
 )
 
 const createJobSeeker = `-- name: CreateJobSeeker :one
-
 INSERT INTO JobSeeker (
   user_id,
-  resume,
   skills,
   created_at,
   updated_at
 ) VALUES (
-  $1, $2, $3::text[],
+  $1, $2,
   CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 ) RETURNING id
 `
 
 type CreateJobSeekerParams struct {
-	UserID  sql.NullInt32  `json:"user_id"`
-	Resume  sql.NullString `json:"resume"`
-	Column3 []string       `json:"column_3"`
+	UserID sql.NullInt32 `json:"user_id"`
+	Skills []string      `json:"skills"`
 }
 
-// jobseeker.sql
 // Insert
 func (q *Queries) CreateJobSeeker(ctx context.Context, arg CreateJobSeekerParams) (int32, error) {
-	row := q.queryRow(ctx, q.createJobSeekerStmt, createJobSeeker, arg.UserID, arg.Resume, pq.Array(arg.Column3))
+	row := q.queryRow(ctx, q.createJobSeekerStmt, createJobSeeker, arg.UserID, pq.Array(arg.Skills))
 	var id int32
 	err := row.Scan(&id)
 	return id, err
@@ -52,7 +48,7 @@ func (q *Queries) DeleteJobSeeker(ctx context.Context, id int32) error {
 }
 
 const getJobSeekers = `-- name: GetJobSeekers :many
-SELECT id, user_id, resume, skills, created_at, updated_at FROM JobSeeker
+SELECT id, user_id, skills, created_at, updated_at FROM JobSeeker
 `
 
 // Select all
@@ -68,7 +64,6 @@ func (q *Queries) GetJobSeekers(ctx context.Context) ([]Jobseeker, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
-			&i.Resume,
 			pq.Array(&i.Skills),
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -87,23 +82,17 @@ func (q *Queries) GetJobSeekers(ctx context.Context) ([]Jobseeker, error) {
 }
 
 const updateJobSeeker = `-- name: UpdateJobSeeker :exec
-UPDATE JobSeeker SET user_id = $1, resume = $2, skills = $3::text[], updated_at = CURRENT_TIMESTAMP WHERE id = $4
+UPDATE JobSeeker SET user_id = $1, skills = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3
 `
 
 type UpdateJobSeekerParams struct {
-	UserID  sql.NullInt32  `json:"user_id"`
-	Resume  sql.NullString `json:"resume"`
-	Column3 []string       `json:"column_3"`
-	ID      int32          `json:"id"`
+	UserID sql.NullInt32 `json:"user_id"`
+	Skills []string      `json:"skills"`
+	ID     int32         `json:"id"`
 }
 
 // Update
 func (q *Queries) UpdateJobSeeker(ctx context.Context, arg UpdateJobSeekerParams) error {
-	_, err := q.exec(ctx, q.updateJobSeekerStmt, updateJobSeeker,
-		arg.UserID,
-		arg.Resume,
-		pq.Array(arg.Column3),
-		arg.ID,
-	)
+	_, err := q.exec(ctx, q.updateJobSeekerStmt, updateJobSeeker, arg.UserID, pq.Array(arg.Skills), arg.ID)
 	return err
 }

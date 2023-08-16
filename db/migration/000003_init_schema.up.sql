@@ -15,13 +15,10 @@ CREATE TABLE "User" (
 CREATE TABLE JobSeeker (
   id SERIAL PRIMARY KEY,
   user_id INT UNIQUE,
-  resume VARCHAR(512),
-  skills text[],
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES "User"(id)
 );
-
 
 CREATE TABLE Company (
   id SERIAL PRIMARY KEY,
@@ -128,6 +125,7 @@ CREATE TABLE Skill (
 CREATE TABLE JobSeekerSkill (
   job_seeker_id INT,
   skill_id INT,
+  skills TEXT[],
   PRIMARY KEY (job_seeker_id, skill_id),
   FOREIGN KEY (job_seeker_id) REFERENCES JobSeeker(id),
   FOREIGN KEY (skill_id) REFERENCES Skill(id)

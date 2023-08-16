@@ -10,12 +10,11 @@ CREATE TABLE "User" (
 CREATE TABLE JobSeeker (
   id SERIAL PRIMARY KEY,
   user_id INT UNIQUE,
-  resume TEXT,
-  skills TEXT[],
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES "User"(id)
 );
+
 
 CREATE TABLE Company (
   id SERIAL PRIMARY KEY,
