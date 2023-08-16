@@ -4,10 +4,10 @@ VALUES ($1, $2, $3, $4)
 RETURNING id;
 
 -- name: SelectAllChatbotInterviews :many
-SELECT * FROM ChatbotInterview;
+SELECT id, job_seeker_id, job_id, status, review, created_at, updated_at FROM ChatbotInterview;
 
 -- name: SelectChatbotInterviewByID :one
-SELECT * FROM ChatbotInterview WHERE id = $1;
+SELECT id, job_seeker_id, job_id, status, review, created_at, updated_at FROM ChatbotInterview WHERE id = $1;
 
 -- name: UpdateChatbotInterview :exec
 UPDATE ChatbotInterview SET status = $1, review = $2 WHERE id = $3;

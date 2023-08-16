@@ -53,8 +53,11 @@ func TestSelectAllChatbotInterviews(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
+	createdAt := time.Now()
+	updatedAt := time.Now()
+
 	rows := sqlmock.NewRows([]string{"id", "job_seeker_id", "job_id", "status", "review", "created_at", "updated_at"}).
-		AddRow(1, 1, 2, "status", "review", "status", time.Now(), time.Now())
+		AddRow(1, 1, 2, "status", "review", createdAt, updatedAt)
 
 	mock.ExpectQuery("SELECT (.+) FROM ChatbotInterview").WillReturnRows(rows)
 
@@ -63,13 +66,17 @@ func TestSelectAllChatbotInterviews(t *testing.T) {
 	require.NoError(t, err)
 }
 
+
 func TestSelectChatbotInterviewByID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
 	defer db.Close()
 
+	createdAt := time.Now()
+	updatedAt := time.Now()
+
 	row := sqlmock.NewRows([]string{"id", "job_seeker_id", "job_id", "status", "review", "created_at", "updated_at"}).
-		AddRow(1, 1, 2, "status", "review", "status", time.Now(), time.Now())
+		AddRow(1, 1, 2, "status", "review", createdAt, updatedAt)
 
 	mock.ExpectQuery("SELECT (.+) FROM ChatbotInterview WHERE id =").WithArgs(1).WillReturnRows(row)
 
@@ -77,6 +84,7 @@ func TestSelectChatbotInterviewByID(t *testing.T) {
 	_, err = q.SelectChatbotInterviewByID(context.TODO(), 1)
 	require.NoError(t, err)
 }
+
 
 func TestUpdateChatbotInterview(t *testing.T) {
 	db, mock, err := sqlmock.New()
