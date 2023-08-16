@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/brianvoe/gofakeit/v6"
@@ -56,8 +57,9 @@ func TestSelectMessagesBySenderAndReceiver(t *testing.T) {
 		SenderID:   int32(1),
 		ReceiverID: int32(2),
 	}
+	createdAt, _ := time.Parse("2006-01-02", "2023-08-14")
 	rows := sqlmock.NewRows([]string{"id", "sender_id", "receiver_id", "content", "sender_type", "created_at"}).
-		AddRow(1, 1, 2, "content", "type", "2023-08-14")
+		AddRow(1, 1, 2, "content", "type", createdAt)
 
 	mock.ExpectQuery("SELECT (.+) FROM Messages WHERE sender_id =").WithArgs(param.SenderID, param.ReceiverID).WillReturnRows(rows)
 

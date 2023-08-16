@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/brianvoe/gofakeit/v6"
@@ -47,8 +48,11 @@ func TestGetJobSeekers(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
+	createdAt := time.Now()
+	updatedAt := time.Now()
+
 	rows := sqlmock.NewRows([]string{"id", "user_id", "created_at", "updated_at"}).
-		AddRow(1, 1, "cover_letter", "resume", "status")
+		AddRow(1, 1, createdAt, updatedAt)
 
 	mock.ExpectQuery("SELECT (.+) FROM JobSeeker").WillReturnRows(rows)
 
@@ -56,6 +60,7 @@ func TestGetJobSeekers(t *testing.T) {
 	_, err = q.GetJobSeekers(context.TODO())
 	require.NoError(t, err)
 }
+
 
 func TestUpdateJobSeeker(t *testing.T) {
 	db, mock, err := sqlmock.New()
