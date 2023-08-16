@@ -1,0 +1,43 @@
+# Binaries, build and log files
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/bin/
+
+# Go specific
+*.a
+*.o
+*.p
+*.8
+*.6
+*.5
+*.2
+*.so.dSYM
+*.prof
+/_obj/
+/_test/
+/vendor/
+
+# SQLC specific
+/sqlc/
+
+# Dependency directories
+/vendor/
+
+# IDE and Editor folders
+.vscode/
+.idea/
+
+# macOS specific
+.DS_Store
+
+# Environment files
+.env
+
+# Log files
+*.log
+
+# Any other files/directories you want to ignore
