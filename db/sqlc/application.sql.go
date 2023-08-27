@@ -10,56 +10,86 @@ import (
 	"database/sql"
 )
 
-const deleteApplication = `-- name: DeleteApplication :exec
-DELETE FROM Application WHERE id = $1
-`
+	const deleteApplication = `-- name: DeleteApplication :exec
+	DELETE FROM Application WHERE id = $1
+	`
 
-func (q *Queries) DeleteApplication(ctx context.Context, id int32) error {
-	_, err := q.exec(ctx, q.deleteApplicationStmt, deleteApplication, id)
-	return err
-}
-
-const insertApplication = `-- name: InsertApplication :exec
-INSERT INTO Application (
-  job_seeker_id, job_id, cover_letter, resume, status
-) VALUES (
-  $1, $2, $3, $4, $5
-) RETURNING id
-`
-
-type InsertApplicationParams struct {
-	JobSeekerID sql.NullInt32         `json:"job_seeker_id"`
-	JobID       sql.NullInt32         `json:"job_id"`
-	CoverLetter sql.NullString        `json:"cover_letter"`
-	Resume      sql.NullString        `json:"resume"`
-	Status      NullApplicationStatus `json:"status"`
-}
-
-func (q *Queries) InsertApplication(ctx context.Context, arg InsertApplicationParams) error {
-	_, err := q.exec(ctx, q.insertApplicationStmt, insertApplication,
-		arg.JobSeekerID,
-		arg.JobID,
-		arg.CoverLetter,
-		arg.Resume,
-		arg.Status,
-	)
-	return err
-}
-
-const selectAllApplications = `-- name: SelectAllApplications :many
-SELECT id, job_seeker_id, job_id, cover_letter, resume, status, created_at, updated_at FROM Application
-`
-
-func (q *Queries) SelectAllApplications(ctx context.Context) ([]Application, error) {
-	rows, err := q.query(ctx, q.selectAllApplicationsStmt, selectAllApplications)
-	if err != nil {
-		return nil, err
+	func (q *Queries) DeleteApplication(ctx context.Context, id int32) error {
+		_, err := q.exec(ctx, q.deleteApplicationStmt, deleteApplication, id)
+		return err
 	}
-	defer rows.Close()
-	var items []Application
-	for rows.Next() {
+
+	const insertApplication = `-- name: InsertApplication :exec
+	INSERT INTO Application (
+		job_seeker_id, job_id, cover_letter, resume, status
+	) VALUES (
+		$1, $2, $3, $4, $5
+	) RETURNING id
+	`
+
+	type InsertApplicationParams struct {
+		JobSeekerID sql.NullInt32         `json:"job_seeker_id"`
+		JobID       sql.NullInt32         `json:"job_id"`
+		CoverLetter sql.NullString        `json:"cover_letter"`
+		Resume      sql.NullString        `json:"resume"`
+		Status      NullApplicationStatus `json:"status"`
+	}
+
+	func (q *Queries) InsertApplication(ctx context.Context, arg InsertApplicationParams) error {
+		_, err := q.exec(ctx, q.insertApplicationStmt, insertApplication,
+			arg.JobSeekerID,
+			arg.JobID,
+			arg.CoverLetter,
+			arg.Resume,
+			arg.Status,
+		)
+		return err
+	}
+
+	const selectAllApplications = `-- name: SelectAllApplications :many
+	SELECT id, job_seeker_id, job_id, cover_letter, resume, status, created_at, updated_at FROM Application
+	`
+
+	func (q *Queries) SelectAllApplications(ctx context.Context) ([]Application, error) {
+		rows, err := q.query(ctx, q.selectAllApplicationsStmt, selectAllApplications)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+		var items []Application
+		for rows.Next() {
+			var i Application
+			if err := rows.Scan(
+				&i.ID,
+				&i.JobSeekerID,
+				&i.JobID,
+				&i.CoverLetter,
+				&i.Resume,
+				&i.Status,
+				&i.CreatedAt,
+				&i.UpdatedAt,
+			); err != nil {
+				return nil, err
+			}
+			items = append(items, i)
+		}
+		if err := rows.Close(); err != nil {
+			return nil, err
+		}
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+		return items, nil
+	}
+
+	const selectApplicationByID = `-- name: SelectApplicationByID :one
+	SELECT id, job_seeker_id, job_id, cover_letter, resume, status, created_at, updated_at FROM Application WHERE id = $1
+	`
+
+	func (q *Queries) SelectApplicationByID(ctx context.Context, id int32) (Application, error) {
+		row := q.queryRow(ctx, q.selectApplicationByIDStmt, selectApplicationByID, id)
 		var i Application
-		if err := rows.Scan(
+		err := row.Scan(
 			&i.ID,
 			&i.JobSeekerID,
 			&i.JobID,
@@ -68,57 +98,27 @@ func (q *Queries) SelectAllApplications(ctx context.Context) ([]Application, err
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
+		)
+		return i, err
 	}
-	if err := rows.Close(); err != nil {
-		return nil, err
+
+	const updateApplication = `-- name: UpdateApplication :exec
+	UPDATE Application SET cover_letter = $1, resume = $2, status = $3 WHERE id = $4
+	`
+
+	type UpdateApplicationParams struct {
+		CoverLetter sql.NullString        `json:"cover_letter"`
+		Resume      sql.NullString        `json:"resume"`
+		Status      NullApplicationStatus `json:"status"`
+		ID          int32                 `json:"id"`
 	}
-	if err := rows.Err(); err != nil {
-		return nil, err
+
+	func (q *Queries) UpdateApplication(ctx context.Context, arg UpdateApplicationParams) error {
+		_, err := q.exec(ctx, q.updateApplicationStmt, updateApplication,
+			arg.CoverLetter,
+			arg.Resume,
+			arg.Status,
+			arg.ID,
+		)
+		return err
 	}
-	return items, nil
-}
-
-const selectApplicationByID = `-- name: SelectApplicationByID :one
-SELECT id, job_seeker_id, job_id, cover_letter, resume, status, created_at, updated_at FROM Application WHERE id = $1
-`
-
-func (q *Queries) SelectApplicationByID(ctx context.Context, id int32) (Application, error) {
-	row := q.queryRow(ctx, q.selectApplicationByIDStmt, selectApplicationByID, id)
-	var i Application
-	err := row.Scan(
-		&i.ID,
-		&i.JobSeekerID,
-		&i.JobID,
-		&i.CoverLetter,
-		&i.Resume,
-		&i.Status,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const updateApplication = `-- name: UpdateApplication :exec
-UPDATE Application SET cover_letter = $1, resume = $2, status = $3 WHERE id = $4
-`
-
-type UpdateApplicationParams struct {
-	CoverLetter sql.NullString        `json:"cover_letter"`
-	Resume      sql.NullString        `json:"resume"`
-	Status      NullApplicationStatus `json:"status"`
-	ID          int32                 `json:"id"`
-}
-
-func (q *Queries) UpdateApplication(ctx context.Context, arg UpdateApplicationParams) error {
-	_, err := q.exec(ctx, q.updateApplicationStmt, updateApplication,
-		arg.CoverLetter,
-		arg.Resume,
-		arg.Status,
-		arg.ID,
-	)
-	return err
-}

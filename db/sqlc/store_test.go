@@ -42,3 +42,4 @@ func TestExecTx(t *testing.T) {
 	require.NoError(t, err) // Expect no errors
 	require.NoError(t, mock.ExpectationsWereMet()) // All SQL queries were properly mocked
 }
+
